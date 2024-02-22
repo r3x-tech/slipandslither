@@ -1,33 +1,40 @@
 import { create } from "zustand";
 
 type GameSettingsState = {
-  defaultBallImage: string;
-  ballImage: string;
-  ballGenerationPrompt: string;
-  defaultBarrierImage: string;
-  barrierImage: string;
-  barrierGenerationPrompt: string;
-  mechanics: {};
-  setBallImage: (ballImage: string) => void;
-  setBallGenerationPrompt: (ballGenerationPrompt: string) => void;
-  setBarrierImage: (barrierImage: string) => void;
-  setBarrierGenerationPrompt: (barrierGenerationPrompt: string) => void;
-  setMechanics: (mechanics: string) => void;
+  defaultAppleImage: string;
+  appleImage: string;
+  appleGenerationPrompt: string;
+  defaultBombImage: string;
+  bombImage: string;
+  bombGenerationPrompt: string;
+  defaultSnakeBodyImage: string;
+  snakeBodyImage: string;
+  snakeBodyGenerationPrompt: string;
+  setAppleImage: (appleImage: string) => void;
+  setAppleGenerationPrompt: (appleGenerationPrompt: string) => void;
+  setBombImage: (bombImage: string) => void;
+  setBombGenerationPrompt: (bombGenerationPrompt: string) => void;
+  setSnakeBodyImage: (snakeBodyImage: string) => void;
+  setSnakeBodyGenerationPrompt: (snakeBodyGenerationPrompt: string) => void;
 };
 
 export const useGameSettingsStore = create<GameSettingsState>((set) => ({
-  defaultBallImage: "/assets/ball.png",
-  ballImage: "/assets/ball.png",
-  ballGenerationPrompt: "",
-  defaultBarrierImage: "/assets/barrier.png",
-  barrierImage: "/assets/barrier.png",
-  barrierGenerationPrompt: "",
-  mechanics: {},
-  setBallImage: (ballImage: string) => set({ ballImage }),
-  setBallGenerationPrompt: (ballGenerationPrompt: string) =>
-    set({ ballGenerationPrompt }),
-  setBarrierImage: (barrierImage: string) => set({ barrierImage }),
-  setBarrierGenerationPrompt: (barrierGenerationPrompt: string) =>
-    set({ barrierGenerationPrompt }),
-  setMechanics: (mechanics: string) => set({ mechanics }),
+  defaultAppleImage: "/assets/ball.png",
+  appleImage: "/assets/ball.png",
+  appleGenerationPrompt: "",
+  defaultBombImage: "/assets/barrier.png",
+  bombImage: "/assets/barrier.png",
+  bombGenerationPrompt: "",
+  defaultSnakeBodyImage: "/assets/barrier.png",
+  snakeBodyImage: "/assets/barrier.png",
+  snakeBodyGenerationPrompt: "",
+  setAppleImage: (appleImage: string) => set({ appleImage }),
+  setAppleGenerationPrompt: (appleGenerationPrompt: string) =>
+    set({ appleGenerationPrompt }),
+  setBombImage: (bombImage: string) => set({ bombImage }),
+  setBombGenerationPrompt: (bombGenerationPrompt: string) =>
+    set({ bombGenerationPrompt }),
+  setSnakeBodyImage: (snakeBodyImage: string) => set({ snakeBodyImage }),
+  setSnakeBodyGenerationPrompt: (snakeBodyGenerationPrompt: string) =>
+    set({ snakeBodyGenerationPrompt }),
 }));

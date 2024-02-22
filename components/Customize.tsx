@@ -15,7 +15,7 @@ import {
   Tabs,
   Textarea,
 } from "@chakra-ui/react";
-import { Tournament, getTournamentsByGameName } from "../utils/getTournaments";
+import { Tournament, getTournamentsByGameName } from "../utils/tournament";
 import theme from "@/styles/theme";
 import Link from "next/link";
 import { useLoadingStore } from "@/stores/useLoadingStore";
@@ -27,12 +27,12 @@ import toast from "react-hot-toast";
 import { sleep } from "react-query/types/core/utils";
 
 export function Customize() {
-  const [selectedBallImage, setSelectedBallImage] = useState<string | null>(
+  const [selectedAppleImage, setselectedAppleImage] = useState<string | null>(
     null
   );
-  const [selectedBarrierImage, setSelectedBarrierImage] = useState<
-    string | null
-  >(null);
+  const [selectedBombImage, setselectedBombImage] = useState<string | null>(
+    null
+  );
   const {
     handleSubmit: handleSubmitBall,
     control: controlBall,
@@ -47,41 +47,45 @@ export function Customize() {
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
 
   const {
-    defaultBallImage,
-    defaultBarrierImage,
-    ballImage,
-    barrierImage,
-    ballGenerationPrompt,
-    barrierGenerationPrompt,
-    setBallImage,
-    setBarrierImage,
-    setBallGenerationPrompt,
-    setBarrierGenerationPrompt,
+    defaultAppleImage,
+    defaultBombImage,
+    defaultSnakeBodyImage,
+    appleImage,
+    bombImage,
+    snakeBodyImage,
+    appleGenerationPrompt,
+    bombGenerationPrompt,
+    snakeBodyGenerationPrompt,
+    setAppleImage,
+    setBombImage,
+    setAppleGenerationPrompt,
+    setBombGenerationPrompt,
+    setSnakeBodyGenerationPrompt,
   } = useGameSettingsStore();
 
   useEffect(() => {
-    console.log("ball image: ", ballImage);
-    console.log("selectedBallImage: ", selectedBallImage);
+    console.log("apple image: ", appleImage);
+    console.log("selectedAppleImage: ", selectedAppleImage);
     if (
-      (selectedBallImage != null &&
-        selectedBallImage != "" &&
-        ballImage != "/assets/ball.png") ||
-      (selectedBarrierImage != null &&
-        selectedBarrierImage != "" &&
-        barrierImage != "/assets/barrierall.png")
+      (selectedAppleImage != null &&
+        selectedAppleImage != "" &&
+        appleImage != "/assets/ball.png") ||
+      (selectedBombImage != null &&
+        selectedBombImage != "" &&
+        bombImage != "/assets/barrierall.png")
     ) {
       setIsProcessing(false);
-      console.log("ball image: ", ballImage);
-      console.log("selectedBallImage: ", selectedBallImage);
-      console.log("barrier image: ", barrierImage);
-      console.log("selectedBarrierImage: ", selectedBarrierImage);
+      console.log("apple image: ", appleImage);
+      console.log("selectedAppleImage: ", selectedAppleImage);
+      console.log("barrier image: ", bombImage);
+      console.log("selectedBombImage: ", selectedBombImage);
     } else {
     }
-  }, [ballImage, barrierImage, selectedBallImage, selectedBarrierImage]);
+  }, [appleImage, bombImage, selectedAppleImage, selectedBombImage]);
 
-  const handleGenerateBallImage = async (data: FormData) => {
-    console.log("ran handleGenerateBallImage");
-    const prompt = data.aiBallImageInput;
+  const handleGenerateappleImage = async (data: FormData) => {
+    console.log("ran handleGenerateappleImage");
+    const prompt = data.aiappleImageInput;
 
     // Validate prompt
     if (!prompt || prompt.trim().length < 2) {
@@ -90,13 +94,13 @@ export function Customize() {
     }
 
     setIsProcessing(true);
-    setBallGenerationPrompt(prompt);
+    setAppleGenerationPrompt(prompt);
 
     const generatedImageUrl = await generateImageFromPrompt(prompt);
 
     if (generatedImageUrl) {
-      setBallImage(generatedImageUrl);
-      setSelectedBallImage(generatedImageUrl);
+      setAppleImage(generatedImageUrl);
+      setselectedAppleImage(generatedImageUrl);
       toast.success("Generated ball image");
     } else {
       toast.error("Failed to generate image");
@@ -105,9 +109,9 @@ export function Customize() {
     // setIsProcessing(false);
   };
 
-  const handleGenerateBarrierImage = async (data: FormData) => {
-    console.log("ran handleGenerateBarrierImage");
-    const prompt = data.aiBarrierImageInput;
+  const handleGeneratebombImage = async (data: FormData) => {
+    console.log("ran handleGeneratebombImage");
+    const prompt = data.aibombImageInput;
 
     // Validate prompt
     if (!prompt || prompt.trim().length < 2) {
@@ -116,15 +120,15 @@ export function Customize() {
     }
 
     setIsProcessing(true);
-    setBarrierGenerationPrompt(prompt);
+    setBombGenerationPrompt(prompt);
 
     const generatedImageUrl = await generateImageFromPrompt(prompt);
 
     if (generatedImageUrl) {
-      setBarrierImage(generatedImageUrl);
-      console.log("barrier image: ", barrierImage);
-      setSelectedBarrierImage(generatedImageUrl);
-      console.log("selectedBarrierImage: ", selectedBarrierImage);
+      setBombImage(generatedImageUrl);
+      console.log("barrier image: ", bombImage);
+      setselectedBombImage(generatedImageUrl);
+      console.log("selectedBombImage: ", selectedBombImage);
       toast.success("Generated barrier image");
     } else {
       toast.error("Failed to generate image");
@@ -242,10 +246,10 @@ export function Customize() {
                           bg={theme.colors.tertiary}
                           position="relative"
                         >
-                          {selectedBallImage ? (
+                          {selectedAppleImage ? (
                             <Flex boxSize="50px">
                               <Image
-                                src={selectedBallImage}
+                                src={selectedAppleImage}
                                 alt="Generated ball image"
                                 layout="fill"
                                 style={{
@@ -263,7 +267,7 @@ export function Customize() {
                             />
                           )}
                         </Flex>
-                        {selectedBallImage ? (
+                        {selectedAppleImage ? (
                           <Flex
                             flexDirection="column"
                             justifyContent="center"
@@ -284,7 +288,7 @@ export function Customize() {
                               h="100%"
                               color={theme.colors.white}
                             >
-                              Prompt: {ballGenerationPrompt}
+                              Prompt: {appleGenerationPrompt}
                             </Text>
                           </Flex>
                         ) : (
@@ -300,7 +304,7 @@ export function Customize() {
                               fontSize="0.75rem"
                               fontWeight="700"
                             >
-                              DEFAULT BALL IMAGE
+                              DEFAULT APPLE IMAGE
                             </Text>
                             <Text
                               textAlign="start"
@@ -323,10 +327,10 @@ export function Customize() {
                     >
                       <VStack
                         as="form"
-                        onSubmit={handleSubmitBall(handleGenerateBallImage)}
+                        onSubmit={handleSubmitBall(handleGenerateappleImage)}
                       >
                         <Controller
-                          name="aiBallImageInput"
+                          name="aiappleImageInput"
                           control={controlBall}
                           defaultValue=""
                           rules={{ required: true }}
@@ -355,7 +359,7 @@ export function Customize() {
                           )}
                         />
 
-                        {errorsBall.aiBallImageInput && (
+                        {errorsBall.aiappleImageInput && (
                           <Flex
                             w="97%"
                             h="1rem"
@@ -372,7 +376,7 @@ export function Customize() {
                           w="100%"
                           gap="0.75rem"
                           mt={
-                            errorsBall.aiBallImageInput ? "0.15rem" : "0.5rem"
+                            errorsBall.aiappleImageInput ? "0.15rem" : "0.5rem"
                           }
                         >
                           <Button
@@ -390,7 +394,7 @@ export function Customize() {
                             _hover={{ bg: "#ea0000", borderColor: "#ea0000" }}
                             onClick={() => {
                               setIsProcessing(true);
-                              setBallImage(defaultBallImage);
+                              setAppleImage(defaultAppleImage);
                               setIsProcessing(false);
                             }}
                           >
@@ -411,7 +415,7 @@ export function Customize() {
                             _hover={{ bg: "#3c33e8", borderColor: "#3c33e8" }}
                             // onClick={() => {
                             //   console.log("check 1 ran");
-                            //   handleSubmit(handleGenerateBallImage);
+                            //   handleSubmit(handleGenerateappleImage);
                             // }}
                             type="submit"
                           >
@@ -432,7 +436,7 @@ export function Customize() {
                       OR{" "}
                     </Text>
                     <Controller
-                      name="ballImage"
+                      name="appleImage"
                       control={control}
                       defaultValue=""
                       render={({ field }) => (
@@ -459,10 +463,10 @@ export function Customize() {
                             accept="image/*"
                             onChange={(e) => {
                               if (e.target.files && e.target.files.length > 0) {
-                                setSelectedBallImage(e.target.files[0]);
+                                setselectedAppleImage(e.target.files[0]);
                                 field.onChange(e.target.files[0].name);
                               } else {
-                                setSelectedBallImage(null);
+                                setselectedAppleImage(null);
                                 field.onChange("");
                               }
                             }}
@@ -475,7 +479,7 @@ export function Customize() {
                       )}
                     />
 
-                    {errors.ballImage && <span>Ball image is required</span>} */}
+                    {errors.appleImage && <span>Ball image is required</span>} */}
                   </Flex>
                 </TabPanel>
                 <TabPanel py={0} px={0}>
@@ -500,10 +504,10 @@ export function Customize() {
                           marginRight="1rem"
                           position="relative"
                         >
-                          {selectedBarrierImage ? (
+                          {selectedBombImage ? (
                             <Flex boxSize="50px">
                               <Image
-                                src={selectedBarrierImage}
+                                src={selectedBombImage}
                                 alt="Generated barrier image"
                                 layout="fill"
                                 // style={{
@@ -521,7 +525,7 @@ export function Customize() {
                             />
                           )}
                         </Flex>
-                        {selectedBarrierImage ? (
+                        {selectedBombImage ? (
                           <Flex
                             flexDirection="column"
                             justifyContent="center"
@@ -541,7 +545,7 @@ export function Customize() {
                               h="100%"
                               color={theme.colors.white}
                             >
-                              Prompt: {barrierGenerationPrompt}
+                              Prompt: {bombGenerationPrompt}
                             </Text>
                           </Flex>
                         ) : (
@@ -580,12 +584,10 @@ export function Customize() {
                     >
                       <VStack
                         as="form"
-                        onSubmit={handleSubmitBarrier(
-                          handleGenerateBarrierImage
-                        )}
+                        onSubmit={handleSubmitBarrier(handleGeneratebombImage)}
                       >
                         <Controller
-                          name="aiBarrierImageInput"
+                          name="aibombImageInput"
                           control={controlBarrier}
                           defaultValue=""
                           rules={{ required: true }}
@@ -614,7 +616,7 @@ export function Customize() {
                           )}
                         />
 
-                        {errorsBarrier.aiBarrierImageInput && (
+                        {errorsBarrier.aibombImageInput && (
                           <Flex
                             w="97%"
                             h="1rem"
@@ -631,7 +633,7 @@ export function Customize() {
                           w="100%"
                           gap="0.75rem"
                           mt={
-                            errorsBall.aiBallImageInput ? "0.15rem" : "0.5rem"
+                            errorsBall.aiappleImageInput ? "0.15rem" : "0.5rem"
                           }
                         >
                           <Button
@@ -649,7 +651,7 @@ export function Customize() {
                             _hover={{ bg: "#ea0000", borderColor: "#ea0000" }}
                             onClick={() => {
                               setIsProcessing(true);
-                              setBarrierImage(defaultBarrierImage);
+                              setBombImage(defaultBombImage);
                               setIsProcessing(false);
                             }}
                           >
@@ -680,14 +682,263 @@ export function Customize() {
                 </TabPanel>
                 <TabPanel py={0} px={0}>
                   <Flex
-                    h="14rem"
+                    flexDirection="column"
                     w="100%"
-                    justifyContent="center"
-                    align="center"
+                    color={theme.colors.white}
+                    // bg={theme.colors.secondary}
                   >
-                    <Text color="#fbfbfb" textAlign="center" fontSize="0.8rem">
-                      CUSTOM MECHANICS COMING SOON
+                    <Flex alignItems="center" my="1.5rem">
+                      <Flex
+                        align="center"
+                        justifyContent="start"
+                        borderRadius="1px"
+                        w="100%"
+                      >
+                        <Flex
+                          align="center"
+                          justifyContent="center"
+                          w="100%"
+                          boxSize="50px"
+                          overflow="hidden"
+                          borderRadius="50%"
+                          marginRight="1rem"
+                          bg={theme.colors.tertiary}
+                          position="relative"
+                        >
+                          {selectedAppleImage ? (
+                            <Flex boxSize="50px">
+                              <Image
+                                src={selectedAppleImage}
+                                alt="Generated ball image"
+                                layout="fill"
+                                style={{
+                                  borderRadius: "50%",
+                                }}
+                                unoptimized={true}
+                              />
+                            </Flex>
+                          ) : (
+                            <Image
+                              src={"/assets/ball.png"} // Adjust the path according to your public directory structure
+                              alt="Default ball image"
+                              layout="fill"
+                              style={{ borderRadius: "50%" }}
+                            />
+                          )}
+                        </Flex>
+                        {selectedAppleImage ? (
+                          <Flex
+                            flexDirection="column"
+                            justifyContent="center"
+                            align="start"
+                          >
+                            <Text
+                              textAlign="start"
+                              h="100%"
+                              color={theme.colors.white}
+                              fontSize="0.75rem"
+                              fontWeight="700"
+                            >
+                              GENERATED BALL IMAGE
+                            </Text>
+                            <Text
+                              fontSize="0.75rem"
+                              textAlign="start"
+                              h="100%"
+                              color={theme.colors.white}
+                            >
+                              Prompt: {appleGenerationPrompt}
+                            </Text>
+                          </Flex>
+                        ) : (
+                          <Flex
+                            flexDirection="column"
+                            justifyContent="center"
+                            align="start"
+                          >
+                            <Text
+                              textAlign="start"
+                              h="100%"
+                              color={theme.colors.white}
+                              fontSize="0.75rem"
+                              fontWeight="700"
+                            >
+                              DEFAULT APPLE IMAGE
+                            </Text>
+                            <Text
+                              textAlign="start"
+                              h="100%"
+                              color={theme.colors.white}
+                              fontSize="0.75rem"
+                            >
+                              Color #FF0034
+                            </Text>
+                          </Flex>
+                        )}
+                      </Flex>
+                    </Flex>
+
+                    <Flex
+                      flexDirection="column"
+                      align="flex-end"
+                      w="100%"
+                      mt="0rem"
+                    >
+                      <VStack
+                        as="form"
+                        onSubmit={handleSubmitBall(handleGenerateappleImage)}
+                      >
+                        <Controller
+                          name="aiappleImageInput"
+                          control={controlBall}
+                          defaultValue=""
+                          rules={{ required: true }}
+                          render={({ field }) => (
+                            <Textarea
+                              {...field}
+                              placeholder="Describe ball to generate"
+                              w="100%"
+                              minH="7rem"
+                              resize="vertical"
+                              overflowY="auto"
+                              fontSize="0.75rem"
+                              bg={theme.colors.input}
+                              borderWidth="2px"
+                              borderRadius="1px"
+                              borderColor={theme.colors.input}
+                              fontWeight="500"
+                              letterSpacing="1px"
+                              color={theme.colors.white}
+                              focusBorderColor={theme.colors.input}
+                              _placeholder={{
+                                color: theme.colors.darkerGray,
+                              }}
+                              _focus={{ boxShadow: "none" }}
+                            />
+                          )}
+                        />
+
+                        {errorsBall.aiappleImageInput && (
+                          <Flex
+                            w="97%"
+                            h="1rem"
+                            justifyContent="start"
+                            m="0"
+                            p="0"
+                          >
+                            <Text fontSize="0.75rem" color="red" m="0" p="0">
+                              Ball description is required
+                            </Text>
+                          </Flex>
+                        )}
+                        <Flex
+                          w="100%"
+                          gap="0.75rem"
+                          mt={
+                            errorsBall.aiappleImageInput ? "0.15rem" : "0.5rem"
+                          }
+                        >
+                          <Button
+                            bg={theme.colors.red}
+                            color="white"
+                            width="100%"
+                            borderColor={theme.colors.red}
+                            borderWidth="2px"
+                            borderRadius="1px"
+                            h="2.25rem"
+                            w="100%"
+                            fontSize="0.8rem"
+                            fontWeight="700"
+                            isDisabled={false}
+                            _hover={{ bg: "#ea0000", borderColor: "#ea0000" }}
+                            onClick={() => {
+                              setIsProcessing(true);
+                              setAppleImage(defaultAppleImage);
+                              setIsProcessing(false);
+                            }}
+                          >
+                            RESET TO DEFAULT
+                          </Button>
+                          <Button
+                            bg={theme.colors.tertiary}
+                            color="white"
+                            width="100%"
+                            borderColor={theme.colors.tertiary}
+                            borderWidth="2px"
+                            borderRadius="1px"
+                            h="2.25rem"
+                            w="100%"
+                            fontSize="0.8rem"
+                            fontWeight="700"
+                            isDisabled={false}
+                            _hover={{ bg: "#3c33e8", borderColor: "#3c33e8" }}
+                            // onClick={() => {
+                            //   console.log("check 1 ran");
+                            //   handleSubmit(handleGenerateappleImage);
+                            // }}
+                            type="submit"
+                          >
+                            GENERATE W/ AI
+                          </Button>
+                        </Flex>
+                      </VStack>
+                    </Flex>
+
+                    {/* <Text
+                      textAlign="center"
+                      w="100%"
+                      fontWeight="700"
+                      fontSize="0.8rem"
+                      color={theme.colors.white}
+                      my="1rem"
+                    >
+                      OR{" "}
                     </Text>
+                    <Controller
+                      name="appleImage"
+                      control={control}
+                      defaultValue=""
+                      render={({ field }) => (
+                        <label
+                          style={{
+                            textAlign: "center",
+                            display: "inline-block",
+                            width: "auto",
+                            padding: "0.5rem 1rem",
+                            fontSize: "0.75rem",
+                            backgroundColor: theme.colors.background,
+                            borderWidth: "2px",
+                            borderRadius: "1px",
+                            borderColor: theme.colors.lightBlue,
+                            fontWeight: "600",
+                            color: theme.colors.lightBlue,
+                            cursor: "pointer",
+                          }}
+                        >
+                          UPLOAD IMAGE
+                          <Input
+                            {...field}
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => {
+                              if (e.target.files && e.target.files.length > 0) {
+                                setselectedAppleImage(e.target.files[0]);
+                                field.onChange(e.target.files[0].name);
+                              } else {
+                                setselectedAppleImage(null);
+                                field.onChange("");
+                              }
+                            }}
+                            style={{
+                              display: "none",
+                            }}
+                            value=""
+                          />
+                        </label>
+                      )}
+                    />
+
+                    {errors.appleImage && <span>Ball image is required</span>} */}
                   </Flex>
                 </TabPanel>
               </TabPanels>
@@ -700,10 +951,10 @@ export function Customize() {
 }
 
 type FormData = {
-  // ballImage: string;
-  aiBallImageInput: string;
-  // barrierImage: string;
-  aiBarrierImageInput: string;
+  // appleImage: string;
+  aiappleImageInput: string;
+  // bombImage: string;
+  aibombImageInput: string;
 };
 
 function truncateFilename(filename: string, maxLength = 30) {

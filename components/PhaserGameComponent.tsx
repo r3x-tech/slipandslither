@@ -9,10 +9,10 @@ import { useGameOverModalStore } from "@/stores/useGameOverModalStore";
 
 const PhaserGameComponent = () => {
   const gameRef = useRef<Phaser.Game | null>(null);
-  const { ballImage, barrierImage } = useGameSettingsStore();
-  const [currentBallImage, setCurrentBallImage] = useState<string>(ballImage);
-  const [currentBarrierImage, setCurrentBarrierImage] =
-    useState<string>(barrierImage);
+  const { appleImage, bombImage } = useGameSettingsStore();
+  const [currentAppleImage, setCurrentAppleImage] =
+    useState<string>(appleImage);
+  const [currentBombImage, setCurrentBombImage] = useState<string>(bombImage);
 
   const { showGameOverModal } = useGameOverModalStore();
 
@@ -41,7 +41,7 @@ const PhaserGameComponent = () => {
         families: ["Montserrat:100,200,300,400,500,600,700,800,900"],
       },
       active: () => {
-        const mainScene = new MainScene(currentBallImage, currentBarrierImage);
+        const mainScene = new MainScene(bombImage, currentBombImage);
 
         const config: Phaser.Types.Core.GameConfig = {
           type: Phaser.AUTO,
@@ -66,23 +66,23 @@ const PhaserGameComponent = () => {
     return () => {
       gameRef.current?.destroy(true);
     };
-  }, [currentBallImage, currentBarrierImage]);
+  }, [bombImage, currentBombImage]);
 
   useEffect(() => {
-    if (ballImage && ballImage != "/assets/ball.png") {
-      const ballBlob = base64ToBlob(ballImage, "image/png");
-      const ballBlobUrl = URL.createObjectURL(ballBlob);
-      setCurrentBallImage(ballBlobUrl);
+    if (appleImage && appleImage != "/assets/ball.png") {
+      const appleBlob = base64ToBlob(appleImage, "image/png");
+      const appleBlobUrl = URL.createObjectURL(appleBlob);
+      setCurrentAppleImage(appleBlobUrl);
     }
-  }, [ballImage]);
+  }, [appleImage]);
 
   useEffect(() => {
-    if (barrierImage && barrierImage != "/assets/barrier.png") {
-      const barrierBlob = base64ToBlob(barrierImage, "image/png");
-      const barrierBlobUrl = URL.createObjectURL(barrierBlob);
-      setCurrentBarrierImage(barrierBlobUrl);
+    if (bombImage && bombImage != "/assets/barrier.png") {
+      const bombBlob = base64ToBlob(bombImage, "image/png");
+      const bombBlobUrl = URL.createObjectURL(bombBlob);
+      setCurrentBombImage(bombBlobUrl);
     }
-  }, [barrierImage]);
+  }, [bombImage]);
 
   useEffect(() => {
     if (gameRef.current) {

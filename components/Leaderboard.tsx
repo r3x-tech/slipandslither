@@ -10,7 +10,7 @@ import {
   TabPanels,
   TabPanel,
 } from "@chakra-ui/react";
-import { getLeaderboard, Score } from "../utils/getLeaderboard";
+import { getLeaderboard, Score } from "../utils/supabase";
 import theme from "@/styles/theme";
 
 export function Leaderboard() {
@@ -27,6 +27,7 @@ export function Leaderboard() {
         fontSize="21px"
         fontWeight="700"
         width="100%"
+        height="100%"
         textAlign="start"
       >
         LEADERBOARDS
@@ -69,8 +70,13 @@ export function Leaderboard() {
         </TabList>
 
         <TabPanels>
-          <TabPanel py={0} px={0}>
-            <List mt="1rem" width="100%" overflowY="auto">
+          <TabPanel
+            py={0}
+            px={0}
+            maxHeight="calc(22rem - 6rem)"
+            overflowY="auto"
+          >
+            <List mt="1rem" width="100%">
               {topScores.length > 0 ? (
                 topScores.map((score: Score, index: number) => (
                   <Flex key={index} align="center" mb="12px" height="40px">
