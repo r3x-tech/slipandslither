@@ -35,38 +35,46 @@ export const ParticleContextProvider = ({
   const [solanaWallet, setSolanaWallet] = useState<SolanaWallet | null>(null);
 
   useEffect(() => {
-    const particle = new ParticleNetwork({
-      projectId: "a54076a8-8c47-4055-8090-30ba53356593",
-      clientKey: "cYy4WdR9w5DfBsoWvmGsSQFWPADTffgIaCrDtZzk",
-      appId: "a49face1-9729-4464-90b1-51cd85c0604f",
-      chainName: "solana",
-      chainId: 101, //optional: current chain id, default 1.
-      wallet: {
-        //optional: by default, the wallet entry is displayed in the bottom right corner of the webpage.
-        displayWalletEntry: true, //show wallet entry when connect particle.
-        defaultWalletEntryPosition: WalletEntryPosition.BR, //wallet entry position
-        uiMode: "dark", //optional: light or dark, if not set, the default is the same as web auth.
-        supportChains: [{ id: 101, name: "Solana" }], // optional: web wallet support chains.
-        customStyle: {}, //optional: custom wallet style
-      },
-      securityAccount: {
-        //optional: particle security account config
-        //prompt set payment password. 0: None, 1: Once(default), 2: Always
-        promptSettingWhenSign: 2,
-        //prompt set master password. 0: None(default), 1: Once, 2: Always
-        promptMasterPasswordSettingWhenLogin: 1,
-      },
-    });
+    if (
+      process.env.NEXT_PUBLIC_PARTICLE_PROJECT_ID &&
+      process.env.NEXT_PUBLIC_PARTICLE_CLIENT_KEY &&
+      process.env.NEXT_PUBLIC_PARTICLE_APP_ID
+    ) {
+      const particle = new ParticleNetwork({
+        projectId: process.env.NEXT_PUBLIC_PARTICLE_PROJECT_ID,
+        clientKey: process.env.NEXT_PUBLIC_PARTICLE_CLIENT_KEY,
+        appId: process.env.NEXT_PUBLIC_PARTICLE_APP_ID,
+        chainName: "solana",
+        chainId: 101, //optional: current chain id, default 1.
+        wallet: {
+          //optional: by default, the wallet entry is displayed in the bottom right corner of the webpage.
+          displayWalletEntry: true, //show wallet entry when connect particle.
+          defaultWalletEntryPosition: WalletEntryPosition.BR, //wallet entry position
+          uiMode: "dark", //optional: light or dark, if not set, the default is the same as web auth.
+          supportChains: [{ id: 101, name: "Solana" }], // optional: web wallet support chains.
+          customStyle: {}, //optional: custom wallet style
+        },
+        securityAccount: {
+          //optional: particle security account config
+          //prompt set payment password. 0: None, 1: Once(default), 2: Always
+          promptSettingWhenSign: 2,
+          //prompt set master password. 0: None(default), 1: Once, 2: Always
+          promptMasterPasswordSettingWhenLogin: 1,
+        },
+      });
 
-    const currentParticleProvider = new ParticleNetworkProvider(particle.auth);
-    // if (typeof window !== "undefined") {
-    //   window.solana = particleProvider;
-    // }
-    const currentSolanaWallet = new SolanaWallet(particle.auth);
+      const currentParticleProvider = new ParticleNetworkProvider(
+        particle.auth
+      );
+      // if (typeof window !== "undefined") {
+      //   window.solana = particleProvider;
+      // }
+      const currentSolanaWallet = new SolanaWallet(particle.auth);
 
-    setParticle(particle);
-    setParticleProvider(currentParticleProvider);
-    setSolanaWallet(currentSolanaWallet);
+      setParticle(particle);
+      setParticleProvider(currentParticleProvider);
+      setSolanaWallet(currentSolanaWallet);
+    }
   }, []);
 
   return (

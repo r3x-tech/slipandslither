@@ -39,7 +39,7 @@ const Header = ({
     <Flex
       justifyContent="space-between"
       alignItems="center"
-      maxWidth="360px"
+      maxWidth="365px"
       width="100%"
     >
       <Flex flex="2" justifyContent="flex-start">

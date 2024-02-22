@@ -496,7 +496,7 @@ export const LoginComponent = () => {
           borderColor={theme.colors.white}
           borderRadius="0px"
           borderWidth="2px"
-          w="360px"
+          w="365px"
           outline="none"
           zIndex={200}
           boxShadow="1px 1px 20px black"
@@ -568,7 +568,7 @@ export const LoginComponent = () => {
                   </Tooltip>
                 </Flex>
 
-                <Flex w="100%" h="100%" justifyContent="start" align="center">
+                {/* <Flex w="100%" h="100%" justifyContent="start" align="center">
                   <Flex
                     w="12.5rem"
                     h="2.25rem"
@@ -611,7 +611,7 @@ export const LoginComponent = () => {
                   >
                     BUY MORE +
                   </Button>
-                </Flex>
+                </Flex> */}
                 <Flex w="100%">
                   <Button
                     fontSize="0.9rem"

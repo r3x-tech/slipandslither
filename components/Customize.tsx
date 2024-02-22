@@ -27,22 +27,30 @@ import toast from "react-hot-toast";
 import { sleep } from "react-query/types/core/utils";
 
 export function Customize() {
-  const [selectedAppleImage, setselectedAppleImage] = useState<string | null>(
+  const [selectedAppleImage, setSelectedAppleImage] = useState<string | null>(
     null
   );
-  const [selectedBombImage, setselectedBombImage] = useState<string | null>(
+  const [selectedBombImage, setSelectedBombImage] = useState<string | null>(
     null
   );
-  const {
-    handleSubmit: handleSubmitBall,
-    control: controlBall,
-    formState: { errors: errorsBall },
-  } = useForm<FormData>();
+  const [selectedSnakeBodyImage, setSelectedSnakeBodyImage] = useState<
+    string | null
+  >(null);
 
   const {
-    handleSubmit: handleSubmitBarrier,
-    control: controlBarrier,
-    formState: { errors: errorsBarrier },
+    handleSubmit: handleSubmitApple,
+    control: controlApple,
+    formState: { errors: errorsApple },
+  } = useForm<FormData>();
+  const {
+    handleSubmit: handleSubmitBomb,
+    control: controlBomb,
+    formState: { errors: errorsBomb },
+  } = useForm<FormData>();
+  const {
+    handleSubmit: handleSubmitSnakeBody,
+    control: controlSnakeBody,
+    formState: { errors: errorsSnakeBody },
   } = useForm<FormData>();
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
 
@@ -58,6 +66,7 @@ export function Customize() {
     snakeBodyGenerationPrompt,
     setAppleImage,
     setBombImage,
+    setSnakeBodyImage,
     setAppleGenerationPrompt,
     setBombGenerationPrompt,
     setSnakeBodyGenerationPrompt,
@@ -77,15 +86,15 @@ export function Customize() {
       setIsProcessing(false);
       console.log("apple image: ", appleImage);
       console.log("selectedAppleImage: ", selectedAppleImage);
-      console.log("barrier image: ", bombImage);
+      console.log("bomb image: ", bombImage);
       console.log("selectedBombImage: ", selectedBombImage);
     } else {
     }
   }, [appleImage, bombImage, selectedAppleImage, selectedBombImage]);
 
-  const handleGenerateappleImage = async (data: FormData) => {
+  const handleGenerateAppleImage = async (data: FormData) => {
     console.log("ran handleGenerateappleImage");
-    const prompt = data.aiappleImageInput;
+    const prompt = data.aiAppleImageInput;
 
     // Validate prompt
     if (!prompt || prompt.trim().length < 2) {
@@ -100,8 +109,8 @@ export function Customize() {
 
     if (generatedImageUrl) {
       setAppleImage(generatedImageUrl);
-      setselectedAppleImage(generatedImageUrl);
-      toast.success("Generated ball image");
+      setSelectedAppleImage(generatedImageUrl);
+      toast.success("Generated apple image");
     } else {
       toast.error("Failed to generate image");
       setIsProcessing(false);
@@ -109,9 +118,9 @@ export function Customize() {
     // setIsProcessing(false);
   };
 
-  const handleGeneratebombImage = async (data: FormData) => {
+  const handleGenerateBombImage = async (data: FormData) => {
     console.log("ran handleGeneratebombImage");
-    const prompt = data.aibombImageInput;
+    const prompt = data.aiBombImageInput;
 
     // Validate prompt
     if (!prompt || prompt.trim().length < 2) {
@@ -126,10 +135,38 @@ export function Customize() {
 
     if (generatedImageUrl) {
       setBombImage(generatedImageUrl);
-      console.log("barrier image: ", bombImage);
-      setselectedBombImage(generatedImageUrl);
+      console.log("bomb image: ", bombImage);
+      setSelectedBombImage(generatedImageUrl);
       console.log("selectedBombImage: ", selectedBombImage);
-      toast.success("Generated barrier image");
+      toast.success("Generated bomb image");
+    } else {
+      toast.error("Failed to generate image");
+      setIsProcessing(false);
+    }
+    // setIsProcessing(false);
+  };
+
+  const handleGenerateSnakeBodyImage = async (data: FormData) => {
+    console.log("ran handleGenerateSnakeBodyImage");
+    const prompt = data.aiBombImageInput;
+
+    // Validate prompt
+    if (!prompt || prompt.trim().length < 2) {
+      toast.error("Please enter a valid prompt");
+      return;
+    }
+
+    setIsProcessing(true);
+    setSnakeBodyGenerationPrompt(prompt);
+
+    const generatedImageUrl = await generateImageFromPrompt(prompt);
+
+    if (generatedImageUrl) {
+      setSnakeBodyImage(generatedImageUrl);
+      console.log("snake body image: ", bombImage);
+      setSelectedSnakeBodyImage(generatedImageUrl);
+      console.log("selectedSnakeBodyImage: ", selectedSnakeBodyImage);
+      toast.success("Generated bomb image");
     } else {
       toast.error("Failed to generate image");
       setIsProcessing(false);
@@ -184,7 +221,7 @@ export function Customize() {
                   fontWeight="700"
                   h="2rem"
                 >
-                  BALL
+                  SNAKE BODY
                 </Tab>
                 <Tab
                   flex={1}
@@ -200,7 +237,7 @@ export function Customize() {
                   fontWeight="700"
                   h="2rem"
                 >
-                  BARRIER
+                  BOMB
                 </Tab>
                 <Tab
                   flex={1}
@@ -216,7 +253,7 @@ export function Customize() {
                   fontWeight="700"
                   h="2rem"
                 >
-                  MECHANICS
+                  APPLE
                 </Tab>
               </TabList>
 
@@ -246,11 +283,11 @@ export function Customize() {
                           bg={theme.colors.tertiary}
                           position="relative"
                         >
-                          {selectedAppleImage ? (
+                          {selectedSnakeBodyImage ? (
                             <Flex boxSize="50px">
                               <Image
-                                src={selectedAppleImage}
-                                alt="Generated ball image"
+                                src={selectedSnakeBodyImage}
+                                alt="Generated snake body image"
                                 layout="fill"
                                 style={{
                                   borderRadius: "50%",
@@ -261,13 +298,13 @@ export function Customize() {
                           ) : (
                             <Image
                               src={"/assets/ball.png"} // Adjust the path according to your public directory structure
-                              alt="Default ball image"
+                              alt="Default snake body image"
                               layout="fill"
                               style={{ borderRadius: "50%" }}
                             />
                           )}
                         </Flex>
-                        {selectedAppleImage ? (
+                        {selectedSnakeBodyImage ? (
                           <Flex
                             flexDirection="column"
                             justifyContent="center"
@@ -280,7 +317,7 @@ export function Customize() {
                               fontSize="0.75rem"
                               fontWeight="700"
                             >
-                              GENERATED BALL IMAGE
+                              GENERATED SNAKE BODY IMAGE
                             </Text>
                             <Text
                               fontSize="0.75rem"
@@ -288,7 +325,7 @@ export function Customize() {
                               h="100%"
                               color={theme.colors.white}
                             >
-                              Prompt: {appleGenerationPrompt}
+                              Prompt: {snakeBodyGenerationPrompt}
                             </Text>
                           </Flex>
                         ) : (
@@ -304,7 +341,7 @@ export function Customize() {
                               fontSize="0.75rem"
                               fontWeight="700"
                             >
-                              DEFAULT APPLE IMAGE
+                              DEFAULT SNAKE BODY IMAGE
                             </Text>
                             <Text
                               textAlign="start"
@@ -327,17 +364,19 @@ export function Customize() {
                     >
                       <VStack
                         as="form"
-                        onSubmit={handleSubmitBall(handleGenerateappleImage)}
+                        onSubmit={handleSubmitSnakeBody(
+                          handleGenerateSnakeBodyImage
+                        )}
                       >
                         <Controller
-                          name="aiappleImageInput"
-                          control={controlBall}
+                          name="aiSnakeBodyImageInput"
+                          control={controlSnakeBody}
                           defaultValue=""
                           rules={{ required: true }}
                           render={({ field }) => (
                             <Textarea
                               {...field}
-                              placeholder="Describe ball to generate"
+                              placeholder="Describe snake body to generate"
                               w="100%"
                               minH="7rem"
                               resize="vertical"
@@ -359,7 +398,7 @@ export function Customize() {
                           )}
                         />
 
-                        {errorsBall.aiappleImageInput && (
+                        {errorsSnakeBody.aiSnakeBodyImageInput && (
                           <Flex
                             w="97%"
                             h="1rem"
@@ -368,7 +407,7 @@ export function Customize() {
                             p="0"
                           >
                             <Text fontSize="0.75rem" color="red" m="0" p="0">
-                              Ball description is required
+                              Snake body description is required
                             </Text>
                           </Flex>
                         )}
@@ -376,7 +415,9 @@ export function Customize() {
                           w="100%"
                           gap="0.75rem"
                           mt={
-                            errorsBall.aiappleImageInput ? "0.15rem" : "0.5rem"
+                            errorsSnakeBody.aiSnakeBodyImageInput
+                              ? "0.15rem"
+                              : "0.5rem"
                           }
                         >
                           <Button
@@ -394,7 +435,7 @@ export function Customize() {
                             _hover={{ bg: "#ea0000", borderColor: "#ea0000" }}
                             onClick={() => {
                               setIsProcessing(true);
-                              setAppleImage(defaultAppleImage);
+                              setSnakeBodyImage(defaultSnakeBodyImage);
                               setIsProcessing(false);
                             }}
                           >
@@ -479,7 +520,7 @@ export function Customize() {
                       )}
                     />
 
-                    {errors.appleImage && <span>Ball image is required</span>} */}
+                    {errors.appleImage && <span>Apple image is required</span>} */}
                   </Flex>
                 </TabPanel>
                 <TabPanel py={0} px={0}>
@@ -508,7 +549,7 @@ export function Customize() {
                             <Flex boxSize="50px">
                               <Image
                                 src={selectedBombImage}
-                                alt="Generated barrier image"
+                                alt="Generated bomb image"
                                 layout="fill"
                                 // style={{
                                 //   width: "10px",
@@ -520,7 +561,7 @@ export function Customize() {
                           ) : (
                             <Image
                               src={"/assets/barrier.png"} // Adjust the path according to your public directory structure
-                              alt="Default barrier image"
+                              alt="Default bomb image"
                               layout="fill"
                             />
                           )}
@@ -537,7 +578,7 @@ export function Customize() {
                               color={theme.colors.white}
                               fontSize="0.75rem"
                             >
-                              GENERATED BARRIER IMAGE
+                              GENERATED BOMB IMAGE
                             </Text>
                             <Text
                               fontSize="0.75rem"
@@ -561,7 +602,7 @@ export function Customize() {
                               fontSize="0.75rem"
                               fontWeight="700"
                             >
-                              DEFAULT BARRIER IMAGE
+                              DEFAULT BOMB IMAGE
                             </Text>
                             <Text
                               textAlign="start"
@@ -584,17 +625,17 @@ export function Customize() {
                     >
                       <VStack
                         as="form"
-                        onSubmit={handleSubmitBarrier(handleGeneratebombImage)}
+                        onSubmit={handleSubmitBomb(handleGenerateBombImage)}
                       >
                         <Controller
-                          name="aibombImageInput"
-                          control={controlBarrier}
+                          name="aiBombImageInput"
+                          control={controlBomb}
                           defaultValue=""
                           rules={{ required: true }}
                           render={({ field }) => (
                             <Textarea
                               {...field}
-                              placeholder="Describe barrier to generate"
+                              placeholder="Describe bomb to generate"
                               w="100%"
                               minH="7rem"
                               resize="vertical"
@@ -616,7 +657,7 @@ export function Customize() {
                           )}
                         />
 
-                        {errorsBarrier.aibombImageInput && (
+                        {errorsBomb.aiBombImageInput && (
                           <Flex
                             w="97%"
                             h="1rem"
@@ -625,7 +666,7 @@ export function Customize() {
                             p="0"
                           >
                             <Text fontSize="0.75rem" color="red" m="0" p="0">
-                              Barrier description is required{" "}
+                              Bomb description is required{" "}
                             </Text>
                           </Flex>
                         )}
@@ -633,7 +674,7 @@ export function Customize() {
                           w="100%"
                           gap="0.75rem"
                           mt={
-                            errorsBall.aiappleImageInput ? "0.15rem" : "0.5rem"
+                            errorsApple.aiAppleImageInput ? "0.15rem" : "0.5rem"
                           }
                         >
                           <Button
@@ -709,7 +750,7 @@ export function Customize() {
                             <Flex boxSize="50px">
                               <Image
                                 src={selectedAppleImage}
-                                alt="Generated ball image"
+                                alt="Generated apple image"
                                 layout="fill"
                                 style={{
                                   borderRadius: "50%",
@@ -720,7 +761,7 @@ export function Customize() {
                           ) : (
                             <Image
                               src={"/assets/ball.png"} // Adjust the path according to your public directory structure
-                              alt="Default ball image"
+                              alt="Default apple image"
                               layout="fill"
                               style={{ borderRadius: "50%" }}
                             />
@@ -739,7 +780,7 @@ export function Customize() {
                               fontSize="0.75rem"
                               fontWeight="700"
                             >
-                              GENERATED BALL IMAGE
+                              GENERATED APPLE IMAGE
                             </Text>
                             <Text
                               fontSize="0.75rem"
@@ -786,17 +827,17 @@ export function Customize() {
                     >
                       <VStack
                         as="form"
-                        onSubmit={handleSubmitBall(handleGenerateappleImage)}
+                        onSubmit={handleSubmitApple(handleGenerateAppleImage)}
                       >
                         <Controller
-                          name="aiappleImageInput"
-                          control={controlBall}
+                          name="aiAppleImageInput"
+                          control={controlApple}
                           defaultValue=""
                           rules={{ required: true }}
                           render={({ field }) => (
                             <Textarea
                               {...field}
-                              placeholder="Describe ball to generate"
+                              placeholder="Describe apple to generate"
                               w="100%"
                               minH="7rem"
                               resize="vertical"
@@ -818,7 +859,7 @@ export function Customize() {
                           )}
                         />
 
-                        {errorsBall.aiappleImageInput && (
+                        {errorsApple.aiAppleImageInput && (
                           <Flex
                             w="97%"
                             h="1rem"
@@ -827,7 +868,7 @@ export function Customize() {
                             p="0"
                           >
                             <Text fontSize="0.75rem" color="red" m="0" p="0">
-                              Ball description is required
+                              Apple description is required
                             </Text>
                           </Flex>
                         )}
@@ -835,7 +876,7 @@ export function Customize() {
                           w="100%"
                           gap="0.75rem"
                           mt={
-                            errorsBall.aiappleImageInput ? "0.15rem" : "0.5rem"
+                            errorsApple.aiAppleImageInput ? "0.15rem" : "0.5rem"
                           }
                         >
                           <Button
@@ -938,7 +979,7 @@ export function Customize() {
                       )}
                     />
 
-                    {errors.appleImage && <span>Ball image is required</span>} */}
+                    {errors.appleImage && <span>Apple image is required</span>} */}
                   </Flex>
                 </TabPanel>
               </TabPanels>
@@ -952,9 +993,11 @@ export function Customize() {
 
 type FormData = {
   // appleImage: string;
-  aiappleImageInput: string;
+  aiAppleImageInput: string;
   // bombImage: string;
-  aibombImageInput: string;
+  aiBombImageInput: string;
+  // snakeBodyImage: string;
+  aiSnakeBodyImageInput: string;
 };
 
 function truncateFilename(filename: string, maxLength = 30) {
