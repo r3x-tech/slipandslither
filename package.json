@@ -15,6 +15,8 @@
     "@magic-ext/auth": "^4.2.0",
     "@magic-ext/oauth": "^15.2.0",
     "@magic-ext/solana": "^17.2.0",
+    "@particle-network/auth": "^1.3.1",
+    "@particle-network/provider": "^1.3.2",
     "@raindrop-studios/events-client": "^0.14.0",
     "@solana/wallet-adapter-base": "^0.9.22",
     "@solana/wallet-adapter-react": "^0.15.33",
