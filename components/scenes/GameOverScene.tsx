@@ -17,13 +17,17 @@ class GameOverScene extends Phaser.Scene {
     this.load.image("playagain", "../assets/playagain.svg");
     this.load.image("savegame", "../assets/savenewhighscore.svg");
     this.load.image("loginsavegame", "../assets/loginsavegame.svg");
-    this.load.image("background2", "../assets/bg.svg");
   }
 
   create(data: any) {
-    const bg = this.add.image(0, 0, "background2").setOrigin(0, 0);
-    bg.displayWidth = this.sys.canvas.width;
-    bg.displayHeight = this.sys.canvas.height;
+    const graphics = this.add.graphics();
+    graphics.fillStyle(0x000000, 1); // Set the color to black and fully opaque
+    graphics.fillRect(
+      0,
+      0,
+      this.sys.game.config.width as number,
+      this.sys.game.config.height as number
+    );
 
     const width = this.sys.game.config.width as number;
     const height = this.sys.game.config.height as number;
