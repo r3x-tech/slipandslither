@@ -9,6 +9,7 @@ import {
   Tab,
   TabPanels,
   TabPanel,
+  Stack,
 } from "@chakra-ui/react";
 import { getLeaderboard, Score } from "../utils/supabase";
 import theme from "@/styles/theme";
@@ -33,7 +34,7 @@ export function Leaderboard() {
         LEADERBOARDS
       </Text>
       <Tabs variant="soft-rounded" colorScheme="current">
-        <TabList pt="1rem">
+        <TabList pt="0.5rem" pb="0.75rem">
           <Tab
             flex={1}
             borderColor="black"
@@ -69,40 +70,44 @@ export function Leaderboard() {
           </Tab>
         </TabList>
 
-        <TabPanels>
+        <TabPanels p={0} m={0}>
           <TabPanel
             py={0}
             px={0}
             maxHeight="calc(22rem - 6rem)"
             overflowY="auto"
           >
-            <List mt="1rem" width="100%">
+            <List m="0rem" p="0" width="100%" bg="red">
               {topScores.length > 0 ? (
-                topScores.map((score: Score, index: number) => (
-                  <Flex key={index} align="center" mb="12px" height="40px">
-                    <Text
-                      fontSize="18px"
-                      fontWeight="800"
-                      fontFamily="Montserrat"
-                      color="white"
-                      width="2ch"
-                    >
-                      {index + 1}
-                    </Text>
-                    <Box width="100%" ml={1} p={3} backgroundColor="#1A1A1D">
-                      <Flex justifyContent="space-between" width="100%">
-                        <Text fontSize="14px" color="white">
-                          {score.user.slice(0, 3) +
-                            "..." +
-                            score.user.slice(-5)}
-                        </Text>
-                        <Text fontSize="14px" color="white">
-                          {score.score}
-                        </Text>
-                      </Flex>
-                    </Box>
-                  </Flex>
-                ))
+                <Stack spacing="1rem">
+                  {" "}
+                  {/* Add spacing between list items */}
+                  {topScores.map((score: Score, index: number) => (
+                    <Flex key={index} align="center" height="40px">
+                      <Text
+                        fontSize="18px"
+                        fontWeight="800"
+                        fontFamily="Montserrat"
+                        color="white"
+                        width="2ch"
+                      >
+                        {index + 1}
+                      </Text>
+                      <Box width="100%" ml={1} p={3} backgroundColor="#1A1A1D">
+                        <Flex justifyContent="space-between" width="100%">
+                          <Text fontSize="14px" color="white">
+                            {score.user.slice(0, 3) +
+                              "..." +
+                              score.user.slice(-5)}
+                          </Text>
+                          <Text fontSize="14px" color="white">
+                            {score.score}
+                          </Text>
+                        </Flex>
+                      </Box>
+                    </Flex>
+                  ))}
+                </Stack>
               ) : (
                 <Text
                   color="#fbfbfb"
