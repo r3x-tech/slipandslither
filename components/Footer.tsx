@@ -18,7 +18,8 @@ export const Footer = () => (
       <Box
         textAlign="center"
         color="white"
-        padding="0.5rem 0rem"
+        padding="0rem"
+        margin="1rem 0rem 0rem 0rem"
         fontFamily="Montserrat"
         fontSize="0.5rem"
         fontWeight="500"
@@ -29,12 +30,14 @@ export const Footer = () => (
         }}
         cursor="pointer"
       >
-        2023 REX BounceBack. All rights reserved.
+        2023 REX Slip & Slither. All rights reserved.
       </Box>
+
       <Text
         textAlign="center"
         color="white"
-        padding="0.5rem 0rem"
+        padding="0rem"
+        margin="1rem 0rem 0rem 0rem"
         fontFamily="Montserrat"
         fontSize="0.5rem"
         fontWeight="800"

@@ -1,5 +1,5 @@
 import { useScoreStore } from "../../stores/useScoreStore";
-import { saveHighScore } from "../../utils/saveHighScore";
+import { saveHighScore } from "../../utils/supabase";
 import { useGameOverModalStore } from "../../stores/useGameOverModalStore";
 import { useLoadingStore } from "../../stores/useLoadingStore";
 import MainScene from "./MainScene";

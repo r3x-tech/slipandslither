@@ -14,7 +14,7 @@ import {
   Box,
 } from "@chakra-ui/react"; // Import Spinner
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
-import { saveHighScore } from "../utils/saveHighScore";
+import { saveHighScore } from "../utils/supabase";
 import { useScoreStore } from "../stores/useScoreStore";
 import { useLoadingStore } from "../stores/useLoadingStore";
 import { Leaderboard } from "./Leaderboard";

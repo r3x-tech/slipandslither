@@ -28,13 +28,15 @@ import {
 } from "@chakra-ui/react";
 import ipify from "ipify";
 import { useEffect, useState } from "react";
-import { RPCError, RPCErrorCode } from "magic-sdk";
-import { useMagic } from "@/contexts/MagicProvider";
 import theme from "../styles/theme";
 import userStore from "@/stores/userStore";
 import toast from "react-hot-toast";
 import { WalletMultiButton } from "@/components/auth/WalletMultiButton";
-import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import {
+  useAnchorWallet,
+  useConnection,
+  useWallet,
+} from "@solana/wallet-adapter-react";
 import { useRouter } from "next/router";
 import {
   getPlayersByWalletAddress,
@@ -44,22 +46,26 @@ import { countryPhoneCodes } from "./constants";
 import { FaCopy, FaDiscord, FaPhoneAlt, FaTwitter } from "react-icons/fa";
 import { useLoginModalStore } from "@/stores/useLoginModalStore";
 import { useLoadingStore } from "@/stores/useLoadingStore";
-import { saveHighScore } from "@/utils/saveHighScore";
+import { saveHighScore } from "@/utils/supabase";
 import { useScoreStore } from "@/stores/useScoreStore";
 import { useScoreSavedModalStore } from "@/stores/useScoreSavedModalStore";
 import { useGameOverModalStore } from "@/stores/useGameOverModalStore";
 import React from "react";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
+import { Connection, PublicKey } from "@solana/web3.js";
+import BaseWalletMultiButton from "./auth/BaseWalletMultiButton";
+import { useParticle } from "../contexts/ParticleContextProvider";
+import { UserInfo } from "@particle-network/auth";
 
-// const LABELS = {
-//   "change-wallet": "CHANGE WALLET",
-//   connecting: "CONNECTING ...",
-//   "copy-address": "COPY ADDRESS",
-//   copied: "COPIED",
-//   disconnect: "DISCONNECT",
-//   "has-wallet": " LOGIN W/ SOLANA",
-//   "no-wallet": " LOGIN W/ SOLANA",
-// } as const;
+const LABELS = {
+  "change-wallet": "CHANGE WALLET",
+  connecting: "CONNECTING ...",
+  "copy-address": "COPY ADDRESS",
+  copied: "COPIED",
+  disconnect: "DISCONNECT",
+  "has-wallet": " LOGIN W/ SOLANA",
+  "no-wallet": " LOGIN W/ SOLANA",
+} as const;
 
 type ButtonState = {
   buttonState:
@@ -72,7 +78,6 @@ type ButtonState = {
 export const LoginComponent = () => {
   const router = useRouter();
   const heightValue = useBreakpointValue({ base: "100%", md: "100vh" });
-  const { magic } = useMagic();
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState(false);
   const [phone, setPhone] = useState("");
@@ -82,7 +87,6 @@ export const LoginComponent = () => {
   const [loggedInStatus, setLoggedInStatus] = useState(false);
   const [logoutStatus, setLogoutStatus] = useState(false);
   const [googleLoggingIn, setGoogleLoggingIn] = useState(false);
-  const [currentWord, setCurrentWord] = useState("INBOX");
   const { showLoginModal, setShowLoginModal } = useLoginModalStore();
   const { showGameOverModal, setShowGameOverModal } = useGameOverModalStore();
   const loadingStatus = useLoadingStore((state) => state.loadingStatus);
@@ -101,6 +105,8 @@ export const LoginComponent = () => {
     disconnecting,
     wallet,
   } = useWallet();
+  const anchorWallet = useAnchorWallet();
+
   let buttonState: ButtonState["buttonState"];
   if (connecting) {
     buttonState = "connecting";
@@ -119,21 +125,22 @@ export const LoginComponent = () => {
     // console.log("1 - NO WALLET FOUND");
   }
 
+  const { setVisible: setModalVisible } = useWalletModal();
+
   const {
     username,
     loggedIn,
     loginType,
     solana_wallet_address,
+    currentConnection,
     ip_address,
     userProfilePic,
   } = userStore();
 
-  const { setVisible: setModalVisible } = useWalletModal();
-
   const handleCopyClick = async () => {
     try {
       await navigator.clipboard.writeText(solana_wallet_address);
-      toast.success("Copied Username");
+      toast.success("Copied Wallet Address");
     } catch (err) {
       console.error("Failed to copy address: ", err);
       toast.error("Failed to copy address");
@@ -150,171 +157,21 @@ export const LoginComponent = () => {
     return `${name.substring(0, 7)}...${name.substring(name.length - 4)}`;
   };
 
+  const formatWalletAddress = (name: string) => {
+    if (name.length <= 16) {
+      return name;
+    }
+    if (name == "") {
+      return "NA";
+    }
+    return `${name.substring(0, 5)}...${name.substring(name.length - 5)}`;
+  };
+
   const countryCodeToFlagEmoji = (iso: any) => {
     const offset = 127397;
     return [...iso]
       .map((char) => String.fromCodePoint(char.charCodeAt() + offset))
       .join("");
-  };
-
-  useEffect(() => {
-    const fetchOAuthResult = async () => {
-      try {
-        console.log("trying");
-
-        // const metadata = await magic?.user.getInfo();
-        // console.log("google metadata: ", metadata);
-
-        const account = await (magic as any)?.oauth.getRedirectResult();
-        console.log("google account: ", account);
-        if (account) {
-          fetch("https://api.ipify.org?format=json")
-            .then((response) => response.json())
-            .then((data) => {
-              userStore.setState({
-                loggedIn: true,
-                loginType: "GOOGLE",
-                username: account.oauth.userInfo.email || "",
-                solana_wallet_address:
-                  account.magic?.userMetadata.publicAddress || "",
-                ip_address: data.ip,
-              });
-            });
-          setLoginInProgress(false);
-          // router.push("/");
-          // setLoggedInStatus(true);
-          toast.success("Logged in");
-        } else {
-          console.log("no google account found ON CALLBACK");
-        }
-      } catch (e) {
-        console.log("OAuth result fetch error: " + JSON.stringify(e));
-        // handle the error
-      } finally {
-        console.log("callback ran");
-      }
-    };
-
-    // Call fetchOAuthResult only when the URL includes 'oauth/callback'
-    const queryParams = new URLSearchParams(window.location.search);
-    const provider = queryParams.get("provider");
-    if (provider === "google" && !loggedIn) {
-      setLoginInProgress(true);
-      console.log("oauth callback");
-      fetchOAuthResult();
-    }
-  }, [loggedIn, magic, router]);
-
-  const handleGoogleLogin = async () => {
-    setLoginInProgress(true);
-    if (!loggedIn) {
-      try {
-        console.log("google login");
-        await (magic as any)?.oauth.loginWithRedirect({
-          provider: "google",
-          redirectURI: "https://bounceback.r3x.tech/",
-        });
-      } catch (e) {
-        console.log("login error: " + JSON.stringify(e));
-      }
-    }
-  };
-
-  const handlePhoneLogin = async () => {
-    setLoginInProgress(true);
-
-    // Remove any dashes from the phone input
-    const cleanPhone = phone.replace(/-/g, "");
-
-    if (!loggedIn) {
-      if (!(selectedCountryCode + cleanPhone).match(/^\+\d{1,14}$/)) {
-        console.log("phone error");
-        console.log("phone: ", cleanPhone);
-        console.log("phone number: ", selectedCountryCode + cleanPhone);
-
-        setPhoneError(true);
-      } else {
-        try {
-          setPhoneError(false);
-          console.log("phone: ", cleanPhone);
-
-          const account = await magic?.auth.loginWithSMS({
-            phoneNumber: `${selectedCountryCode}${cleanPhone}`,
-          });
-
-          if (account) {
-            const metadata = await magic?.user.getInfo();
-            fetch("https://api.ipify.org?format=json")
-              .then((response) => response.json())
-              .then((data) => {
-                userStore.setState({
-                  loggedIn: true,
-                  loginType: "PHONE",
-                  username: metadata?.phoneNumber || "",
-                  solana_wallet_address: metadata?.publicAddress || "",
-                  ip_address: data.ip,
-                });
-              });
-            setPhone("");
-          } else {
-            console.log("no account");
-          }
-        } catch (e) {
-          console.log("login error: " + JSON.stringify(e));
-          if (e instanceof RPCError) {
-            switch (e.code) {
-              case RPCErrorCode.MagicLinkFailedVerification:
-              case RPCErrorCode.MagicLinkExpired:
-              case RPCErrorCode.MagicLinkRateLimited:
-              case RPCErrorCode.UserAlreadyLoggedIn:
-                toast.error(`${e.message}`);
-                break;
-              default:
-                toast.error("Something went wrong. Please try again");
-            }
-          }
-        } finally {
-          setLoginInProgress(false);
-        }
-      }
-    }
-  };
-
-  const handleSolanaLogin = async () => {
-    setLoginInProgress(true);
-    // Remove any dashes from the phone input
-    const cleanPhone = phone.replace(/-/g, "");
-
-    if (!loggedIn) {
-      switch (buttonState) {
-        case "no-wallet":
-          setModalVisible(true);
-          console.log("RAN NO WALLET");
-          setLoginInProgress(false);
-          break;
-        case "has-wallet":
-          await connect().catch((error) => {
-            // Silently catch because any errors are caught by the context `onError` handler
-            console.error("Connect error: ", error);
-          });
-          if (connect) {
-            await connect().catch((error) => {
-              // Silently catch because any errors are caught by the context `onError` handler
-              console.error("Connect error: ", error);
-            });
-          }
-          break;
-        case "connected":
-          console.log("BWM connected!!!!");
-          setMenuOpen(!menuOpen);
-          break;
-        case "connecting":
-          console.log("BWM connecting!");
-          // You can add additional logic here if needed
-          break;
-        // ... add any additional cases if required
-      }
-    }
   };
 
   useEffect(() => {
@@ -326,7 +183,7 @@ export const LoginComponent = () => {
   }, [loggedIn]);
 
   useEffect(() => {
-    if (publicKey && connected && !loggedIn && !logoutStatus) {
+    if (publicKey && connected && !loggedIn && !logoutStatus && anchorWallet) {
       // console.log("RUNNING SOLANA LOGIN USE EFFECT");
       fetch("https://api.ipify.org?format=json")
         .then((response) => response.json())
@@ -337,6 +194,8 @@ export const LoginComponent = () => {
             loginType: "SOLANA",
             username: publicKey.toString(),
             solana_wallet_address: publicKey.toString(),
+            currentConnection: connection,
+            currentWallet: anchorWallet,
             ip_address: data.ip,
           });
         });
@@ -347,6 +206,7 @@ export const LoginComponent = () => {
       }
     }
   }, [
+    anchorWallet,
     connected,
     connection,
     loadingStatus,
@@ -356,6 +216,7 @@ export const LoginComponent = () => {
     setShowGameOverModal,
     setShowLoginModal,
     showGameOverModal,
+    wallet,
   ]);
 
   useEffect(() => {
@@ -416,56 +277,164 @@ export const LoginComponent = () => {
     solana_wallet_address,
   ]);
 
-  // useEffect(() => {
-  //   console.log(
-  //     "login modal showing status: ",
-  //     useLoginModalStore.getState().showLoginModal
-  //   );
-  //   if (useLoginModalStore.getState().showLoginModal) {
-  //     console.log(
-  //       "login modal is open on save: ",
-  //       useLoginModalStore.getState().showLoginModal
-  //     );
-  //     setIsLoginModalOpen(true);
-  //   }
-  // }, [loggedIn, magic, router]);
+  const context = useParticle();
 
-  // useEffect(() => {
-  //   if (showLoginModal) {
-  //     console.log("login modal is open on save: ", showLoginModal);
-  //     setIsLoginModalOpen(true);
-  //   }
-  // }, [showLoginModal]);
+  if (!context) {
+    // Handle the case where context is not available
+    return (
+      <Flex
+        justifyContent="center"
+        alignItems="center"
+        h="100vh"
+        w="100vw"
+        bg={theme.colors.background}
+      >
+        <Flex
+          w="100%"
+          flexDirection="column"
+          align="center"
+          justifyContent="center"
+          color={theme.colors.red}
+          my="4.58rem"
+        >
+          <Spinner size="sm" />
+          <Text mt={3} fontSize="0.75rem" fontWeight="500">
+            Loading...
+          </Text>
+        </Flex>
+      </Flex>
+    );
+  }
+  const { particle, particleProvider, solanaWallet } = context;
+
+  const handlePhoneLogin = async () => {
+    setLoginInProgress(true);
+
+    // Remove any dashes from the phone input
+    const cleanPhone = phone.replace(/-/g, "");
+
+    if (!loggedIn) {
+      if (!(selectedCountryCode + cleanPhone).match(/^\+\d{1,14}$/)) {
+        console.log("phone error");
+        console.log("phone: ", cleanPhone);
+        console.log("phone number: ", selectedCountryCode + cleanPhone);
+
+        setPhoneError(true);
+      } else {
+        try {
+          setPhoneError(false);
+          console.log("phone: ", cleanPhone);
+          if (particle && solanaWallet) {
+            // const rpcUrl = process.env.NEXT_PUBLIC_ENDPOINT;
+            let userInfo: UserInfo | null;
+
+            if (!particle) {
+              throw Error("Particle unavailable");
+            }
+
+            if (!particle.auth.isLogin()) {
+              // Request user login if needed, returns current user info
+              userInfo = await particle.auth.login({
+                preferredAuthType: "phone",
+                account: selectedCountryCode + cleanPhone, //phone number must use E.164
+              });
+            } else {
+              userInfo = particle.auth.getUserInfo();
+            }
+
+            if (!userInfo) {
+              throw Error("User unavailable");
+            }
+
+            if (!solanaWallet) {
+              throw Error("Wallet unavailable");
+            }
+
+            if (!solanaWallet.signTransaction) {
+              throw Error("Signing unavailable 0x1");
+            }
+
+            if (!solanaWallet.signAllTransactions) {
+              throw Error("Signing unavailable 0x2");
+            }
+
+            fetch("https://api.ipify.org?format=json")
+              .then((response) => response.json())
+              .then((data) => {
+                userStore.setState({
+                  loggedIn: true,
+                  loginType: "PHONE",
+                  username: userInfo!.google_email || "",
+                  solana_wallet_address:
+                    solanaWallet.publicKey?.toBase58() || "",
+                  currentConnection: particle.solana.getRpcUrl()
+                    ? new Connection(particle.solana.getRpcUrl())
+                    : null,
+                  currentWallet: {
+                    publicKey: new PublicKey(
+                      solanaWallet!.publicKey!.toBase58()
+                    ),
+                    signTransaction: solanaWallet.signTransaction,
+                    signAllTransactions: solanaWallet.signAllTransactions,
+                  },
+                  ip_address: data.ip,
+                });
+              });
+            setPhone("");
+          } else {
+            console.log("no account");
+          }
+        } catch (e) {
+          console.log("login error: " + JSON.stringify(e));
+        } finally {
+          setLoginInProgress(false);
+        }
+      }
+    }
+  };
+
+  const handleSolanaLogin = async () => {
+    setLoginInProgress(true);
+
+    if (!loggedIn) {
+      switch (buttonState) {
+        case "no-wallet":
+          setModalVisible(true);
+          console.log("RAN NO WALLET");
+          setLoginInProgress(false);
+          break;
+        case "has-wallet":
+          await connect().catch((error) => {
+            // Silently catch because any errors are caught by the context `onError` handler
+            console.error("Connect error: ", error);
+          });
+          if (connect) {
+            await connect().catch((error) => {
+              // Silently catch because any errors are caught by the context `onError` handler
+              console.error("Connect error: ", error);
+            });
+          }
+          break;
+        case "connected":
+          console.log("BWM connected!!!!");
+          setMenuOpen(!menuOpen);
+          break;
+        case "connecting":
+          console.log("BWM connecting!");
+          // You can add additional logic here if needed
+          break;
+        // ... add any additional cases if required
+      }
+    }
+  };
 
   const handleLogout = async () => {
     try {
       setLogoutStatus(true);
-      if (loggedInStatus && userStore.getState().loginType == "SOLANA") {
-        console.log("disconnectin SOLANANANAANANA");
-        await disconnect()
-          .catch((error) => {
-            // Silently catch because any errors are caught by the context `onError` handler
-            console.error("Disconnect error: ", error);
-            throw Error("Disconnect error");
-          })
-          .then(() => {
-            console.log("COMPLETED disconnectin SOLANANANAANANA");
-            userStore.setState({
-              loggedIn: false,
-              loginType: "",
-              username: "",
-              solana_wallet_address: "",
-            });
-            console.log("ERASED USER STATE disconnectin SOLANANANAANANA");
-            toast.success("Logged out");
-            console.log("SUCCESS disconnectin SOLANANANAANANA");
-          });
-        setLogoutStatus(false);
-        // setIsOpen(false);
-        console.log("2 - running router");
-        router.push("/");
-      } else if (magic && (await magic.user.isLoggedIn())) {
-        await magic.user.logout();
+      if (particle && (await particle.auth.isLogin())) {
+        particle.auth.logout().then(() => {
+          console.log("logout");
+        });
         userStore.setState({
           loggedIn: false,
           loginType: "",
@@ -500,6 +469,11 @@ export const LoginComponent = () => {
           fontWeight="700"
           borderColor="white"
           borderWidth="2px"
+          // borderWidth={
+          //   loggedInStatus || loginInProgress || (connecting && !loggedInStatus)
+          //     ? "2px"
+          //     : "0px"
+          // }
           borderRadius="0px"
           h="2rem"
           color="white"
@@ -515,6 +489,7 @@ export const LoginComponent = () => {
             ? "LOGGING IN..."
             : "LOGIN"}
         </MenuButton>
+
         <MenuList
           bg={theme.colors.black}
           color={theme.colors.white}
@@ -543,7 +518,7 @@ export const LoginComponent = () => {
             </Flex>
           ) : loggedInStatus ? (
             <VStack spacing={4} padding="1rem" align="flex-start">
-              <Flex direction="column" align="flex-start">
+              <Flex direction="column" align="flex-start" w="100%">
                 <Flex m="0.75rem" align="center">
                   <Box>
                     <Image
@@ -558,19 +533,21 @@ export const LoginComponent = () => {
                     />
                   </Box>
                   <Tooltip
-                    label="Address"
-                    aria-label="Address"
+                    label="Wallet Address"
+                    aria-label="Wallet Address"
                     bg="black"
                     border="1px solid white"
                   >
-                    <Text color="white">{formatUsername(username)}</Text>
+                    <Text color="white">
+                      {formatWalletAddress(solana_wallet_address)}
+                    </Text>
                     {/* <Text
-                      textAlign="center"
-                      fontSize="0.75rem"
-                      fontWeight="900"
-                    >
-                      {username.slice(0, 5)}...{username.slice(-10)}
-                    </Text> */}
+                    textAlign="center"
+                    fontSize="0.75rem"
+                    fontWeight="900"
+                  >
+                    {username.slice(0, 5)}...{username.slice(-10)}
+                  </Text> */}
                   </Tooltip>
 
                   <Tooltip
@@ -591,38 +568,72 @@ export const LoginComponent = () => {
                   </Tooltip>
                 </Flex>
 
-                {/* <Button
-                  variant="ghost"
-                  onClick={() => {
-                    router.push("/mymachines");
-                  }}
-                  _hover={{ color: "rgba(255, 255, 255, 0.8)" }}
-                >
-                  My Racks
-                </Button> */}
-                {/* <Button
-                              variant="ghost"
-                              onClick={() => {
-                                router.push("/settings");
-                              }}
-                              _hover={{ color: "rgba(255, 255, 255, 0.8)" }}
-                            >
-                              Settings
-                            </Button> */}
+                <Flex w="100%" h="100%" justifyContent="start" align="center">
+                  <Flex
+                    w="12.5rem"
+                    h="2.25rem"
+                    justifyContent="center"
+                    align="center"
+                  >
+                    <Text
+                      fontSize="0.9rem"
+                      fontWeight="700"
+                      color={theme.colors.primary}
+                    >
+                      Balance:
+                    </Text>
+                    <Text
+                      ml="0.5rem"
+                      fontSize="0.9rem"
+                      fontWeight="700"
+                      color={theme.colors.green}
+                    >
+                      ${`222`}.00 USD
+                    </Text>
+                  </Flex>
+
+                  <Button
+                    fontSize="0.75rem"
+                    fontWeight="700"
+                    as="a"
+                    href="https://www.r3x.tech/contact"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    variant="ghost"
+                    border="2px solid white"
+                    h="1.5rem"
+                    px="0.5rem"
+                    borderRadius="2px"
+                    _hover={{
+                      color: "rgba(255, 255, 255, 0.8)",
+                      borderColor: "rgba(255, 255, 255, 0.8)",
+                    }}
+                  >
+                    BUY MORE +
+                  </Button>
+                </Flex>
+                <Flex w="100%">
+                  <Button
+                    fontSize="0.9rem"
+                    fontWeight="700"
+                    as="a"
+                    href="https://www.r3x.tech/contact"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    variant="ghost"
+                    _hover={{ color: "rgba(255, 255, 255, 0.8)" }}
+                  >
+                    Need Help?
+                  </Button>
+                </Flex>
+
                 <Button
-                  as="a"
-                  href="https://www.r3x.tech/contact"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  variant="ghost"
-                  _hover={{ color: "rgba(255, 255, 255, 0.8)" }}
-                >
-                  Need Help?
-                </Button>
-                <Button
+                  fontSize="0.9rem"
+                  fontWeight="700"
                   variant="ghost"
                   onClick={handleLogout}
-                  _hover={{ color: "rgba(255, 255, 255, 0.8)" }}
+                  color={theme.colors.red}
+                  _hover={{ color: "rgba(255, 0, 0, 0.8)" }}
                 >
                   Logout
                 </Button>
@@ -765,7 +776,7 @@ export const LoginComponent = () => {
                 mt="0rem"
                 gap={3}
               >
-                <Button
+                {/* <Button
                   leftIcon={
                     <Image
                       src="/googleLogo.webp"
@@ -802,7 +813,7 @@ export const LoginComponent = () => {
                   }}
                 >
                   LOGIN W/ GOOGLE
-                </Button>
+                </Button> */}
 
                 <Button
                   leftIcon={
@@ -827,7 +838,11 @@ export const LoginComponent = () => {
                     borderColor: "white",
                   }}
                   isDisabled={loginInProgress}
-                  onClick={() => handleSolanaLogin()}
+                  onClick={() => {
+                    if (!loggedInStatus && !loginInProgress && !connecting) {
+                      handleSolanaLogin();
+                    }
+                  }}
                   isLoading={loginInProgress}
                   spinner={
                     <Flex flexDirection="row" align="center">
@@ -851,6 +866,7 @@ export const LoginComponent = () => {
                       style={{
                         width: "1rem",
                         height: "1rem",
+                        marginLeft: "0.75rem",
                         marginRight: "0.75rem",
                       }}
                     />

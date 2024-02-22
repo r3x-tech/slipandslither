@@ -15,24 +15,9 @@
     "jsx": "preserve",
     "incremental": true,
     "paths": {
-      "@/*": ["./*"],
-      "@magic-ext/solana": [
-        "./node_modules/@magic-ext/solana/dist/types/index.d.ts"
-      ],
-      "@magic-ext/oauth": [
-        "./node_modules/@magic-ext/oauth/dist/types/index.d.ts"
-      ],
-      "@magic-ext/auth": [
-        "./node_modules/@magic-ext/auth/dist/types/index.d.ts"
-      ]
+      "@/*": ["./*"]
     },
-    "typeRoots": [
-      "./types",
-      "./node_modules/@types",
-      "./node_modules/@magic-ext/solana/dist/types",
-      "./node_modules/@magic-ext/oauth/dist/types",
-      "./node_modules/@magic-ext/auth/dist/types"
-    ]
+    "typeRoots": ["./types", "./node_modules/@types"]
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
   "exclude": ["node_modules"]
