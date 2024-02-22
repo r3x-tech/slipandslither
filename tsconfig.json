@@ -1,0 +1,39 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "paths": {
+      "@/*": ["./*"],
+      "@magic-ext/solana": [
+        "./node_modules/@magic-ext/solana/dist/types/index.d.ts"
+      ],
+      "@magic-ext/oauth": [
+        "./node_modules/@magic-ext/oauth/dist/types/index.d.ts"
+      ],
+      "@magic-ext/auth": [
+        "./node_modules/@magic-ext/auth/dist/types/index.d.ts"
+      ]
+    },
+    "typeRoots": [
+      "./types",
+      "./node_modules/@types",
+      "./node_modules/@magic-ext/solana/dist/types",
+      "./node_modules/@magic-ext/oauth/dist/types",
+      "./node_modules/@magic-ext/auth/dist/types"
+    ]
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules"]
+}
