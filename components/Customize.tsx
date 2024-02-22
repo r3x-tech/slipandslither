@@ -73,24 +73,34 @@ export function Customize() {
   } = useGameSettingsStore();
 
   useEffect(() => {
-    console.log("apple image: ", appleImage);
-    console.log("selectedAppleImage: ", selectedAppleImage);
     if (
       (selectedAppleImage != null &&
         selectedAppleImage != "" &&
-        appleImage != "/assets/ball.png") ||
+        appleImage != "/assets/apple.png") ||
       (selectedBombImage != null &&
         selectedBombImage != "" &&
-        bombImage != "/assets/barrierall.png")
+        bombImage != "/assets/bomb.png") ||
+      (selectedSnakeBodyImage != null &&
+        selectedSnakeBodyImage != "" &&
+        snakeBodyImage != "/assets/snakebody.png")
     ) {
       setIsProcessing(false);
       console.log("apple image: ", appleImage);
       console.log("selectedAppleImage: ", selectedAppleImage);
       console.log("bomb image: ", bombImage);
       console.log("selectedBombImage: ", selectedBombImage);
+      console.log("snake body image: ", snakeBodyImage);
+      console.log("selectedSnakeBodyImage: ", selectedSnakeBodyImage);
     } else {
     }
-  }, [appleImage, bombImage, selectedAppleImage, selectedBombImage]);
+  }, [
+    appleImage,
+    bombImage,
+    selectedAppleImage,
+    selectedBombImage,
+    selectedSnakeBodyImage,
+    snakeBodyImage,
+  ]);
 
   const handleGenerateAppleImage = async (data: FormData) => {
     console.log("ran handleGenerateappleImage");
@@ -221,7 +231,7 @@ export function Customize() {
                   fontWeight="700"
                   h="2rem"
                 >
-                  SNAKE BODY
+                  SNAKE
                 </Tab>
                 <Tab
                   flex={1}
@@ -278,9 +288,7 @@ export function Customize() {
                           w="100%"
                           boxSize="50px"
                           overflow="hidden"
-                          borderRadius="50%"
                           marginRight="1rem"
-                          bg={theme.colors.tertiary}
                           position="relative"
                         >
                           {selectedSnakeBodyImage ? (
@@ -289,18 +297,15 @@ export function Customize() {
                                 src={selectedSnakeBodyImage}
                                 alt="Generated snake body image"
                                 layout="fill"
-                                style={{
-                                  borderRadius: "50%",
-                                }}
+                                style={{}}
                                 unoptimized={true}
                               />
                             </Flex>
                           ) : (
                             <Image
-                              src={"/assets/ball.png"} // Adjust the path according to your public directory structure
+                              src={"/assets/snakebody.png"} // Adjust the path according to your public directory structure
                               alt="Default snake body image"
                               layout="fill"
-                              style={{ borderRadius: "50%" }}
                             />
                           )}
                         </Flex>
@@ -539,7 +544,7 @@ export function Customize() {
                         <Flex
                           align="center"
                           justifyContent="center"
-                          w="10px"
+                          w="50px"
                           h="50px"
                           overflow="hidden"
                           marginRight="1rem"
@@ -560,7 +565,7 @@ export function Customize() {
                             </Flex>
                           ) : (
                             <Image
-                              src={"/assets/barrier.png"} // Adjust the path according to your public directory structure
+                              src={"/assets/bomb.png"} // Adjust the path according to your public directory structure
                               alt="Default bomb image"
                               layout="fill"
                             />
@@ -741,9 +746,7 @@ export function Customize() {
                           w="100%"
                           boxSize="50px"
                           overflow="hidden"
-                          borderRadius="50%"
                           marginRight="1rem"
-                          bg={theme.colors.tertiary}
                           position="relative"
                         >
                           {selectedAppleImage ? (
@@ -752,18 +755,14 @@ export function Customize() {
                                 src={selectedAppleImage}
                                 alt="Generated apple image"
                                 layout="fill"
-                                style={{
-                                  borderRadius: "50%",
-                                }}
                                 unoptimized={true}
                               />
                             </Flex>
                           ) : (
                             <Image
-                              src={"/assets/ball.png"} // Adjust the path according to your public directory structure
+                              src={"/assets/apple.png"} // Adjust the path according to your public directory structure
                               alt="Default apple image"
                               layout="fill"
-                              style={{ borderRadius: "50%" }}
                             />
                           )}
                         </Flex>
