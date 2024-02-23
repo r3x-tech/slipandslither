@@ -41,7 +41,7 @@ const PhaserGameComponent = () => {
         families: ["Montserrat:100,200,300,400,500,600,700,800,900"],
       },
       active: () => {
-        const mainScene = new MainScene(bombImage, currentBombImage);
+        const mainScene = new MainScene();
 
         const config: Phaser.Types.Core.GameConfig = {
           type: Phaser.AUTO,
@@ -52,7 +52,7 @@ const PhaserGameComponent = () => {
           physics: {
             default: "arcade",
             arcade: {
-              gravity: { x: 0, y: 300 },
+              gravity: { x: 0, y: 0 }, // Set gravity to zero for both axes
               debug: false,
             },
           },

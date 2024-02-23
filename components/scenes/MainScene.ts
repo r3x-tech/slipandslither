@@ -1,99 +1,77 @@
 import Phaser from "phaser";
 
 export default class MainScene extends Phaser.Scene {
-  private ballImage: string;
-  private barrierImage: string;
-  private ball!: Phaser.Physics.Arcade.Sprite;
+  private snake!: Phaser.GameObjects.Group;
+  private apple!: Phaser.Physics.Arcade.Sprite;
+  private bomb!: Phaser.Physics.Arcade.Sprite;
+  private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
   private score: number = 0;
   private scoreText!: Phaser.GameObjects.Text;
-  private scoreValueText!: Phaser.GameObjects.Text;
-  private level: number = 1;
-  private levelText!: Phaser.GameObjects.Text;
-  private levelValueText!: Phaser.GameObjects.Text;
-  private ballVelocityX: number = 150;
+  private touchStart: Phaser.Math.Vector2;
+  private touchEnd: Phaser.Math.Vector2;
+  private direction: Phaser.Math.Vector2;
   private gameOver: boolean = false;
   private paused: boolean = false;
   private pauseButton!: Phaser.GameObjects.Image;
-  // private leftBarriers: Phaser.Physics.Arcade.Sprite[] = [];
-  // private rightBarriers: Phaser.Physics.Arcade.Sprite[] = [];
-  private lastWallHit: "left" | "right" | null = null;
-  private canIncrementScore: boolean = true;
+  private calculateSwipeDirection() {
+    const dx = this.touchEnd.x - this.touchStart.x;
+    const dy = this.touchEnd.y - this.touchStart.y;
+    const absDx = Math.abs(dx);
+    const absDy = Math.abs(dy);
 
-  constructor(ballImage: string, barrierImage: string) {
-    super({ key: "MainScene" });
-    this.ballImage = ballImage;
-    this.barrierImage = barrierImage;
-    this.score = 0;
-    this.level = 1;
+    if (absDx > absDy) {
+      this.direction.x = dx > 0 ? 1 : -1;
+      this.direction.y = 0;
+    } else {
+      this.direction.x = 0;
+      this.direction.y = dy > 0 ? 1 : -1;
+    }
   }
 
-  resetValues() {
+  constructor() {
+    super("MainScene");
+    this.touchStart = new Phaser.Math.Vector2();
+    this.touchEnd = new Phaser.Math.Vector2();
+    this.direction = new Phaser.Math.Vector2();
+  }
+
+  init() {
+    this.snake = this.add.group();
     this.score = 0;
-    this.level = 1;
-    this.gameOver = false;
-    this.paused = false;
   }
 
   preload() {
-    this.load.image("ball", this.ballImage);
-    this.load.image("barrier", this.barrierImage);
-    this.load.image("pause", "../assets/pause.svg");
-    this.load.image("play", "../assets/play.svg");
+    this.load.image("apple", "../assets/apple.png");
+    this.load.image("bomb", "../assets/bomb.png");
+    this.load.image("body", "../assets/snakebody.png");
   }
 
   create() {
-    this.resetValues();
+    this.physics.world.createDebugGraphic();
 
-    this.cameras.main.setBackgroundColor("#000000");
-    this.physics.world.setBounds(0, 5, 360, 360);
-    this.physics.world.gravity.y = 500;
+    this.cameras.main.setBackgroundColor("#000000"); // Set the camera background to black
 
-    // Add a red rectangle at the top (ceiling)
-    let ceiling = this.add.rectangle(0, 0, 360, 5, 0xff1644).setOrigin(0, 0);
-    ceiling.setDepth(1); // Ensure it's rendered above other objects
+    if (this.input.keyboard) {
+      this.cursors = this.input.keyboard.createCursorKeys();
+    }
+    this.input.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
+      this.touchStart.set(pointer.x, pointer.y);
+    });
 
-    // Add a red rectangle at the bottom (floor)
-    let floor = this.add.rectangle(0, 355, 360, 5, 0xff1644).setOrigin(0, 0);
-    floor.setDepth(1);
+    this.input.on("pointerup", (pointer: Phaser.Input.Pointer) => {
+      this.touchEnd.set(pointer.x, pointer.y);
+      this.calculateSwipeDirection();
+    });
 
-    this.ball = this.physics.add.sprite(175, 175, "ball").setCircle(15);
-    this.ball.displayWidth = 12;
-    this.ball.displayHeight = 12;
-    this.ball.setSize(5, 5);
-    this.ball.setBounce(0, 0);
-    this.ball.setCollideWorldBounds(true, 1, 1, true);
-
-    // Set initial horizontal velocity
-    this.ball.setVelocityX(this.ballVelocityX);
-
-    this.input.on("pointerdown", this.flap, this);
-    this.scoreText = this.add.text(10, 15, "SCORE:", {
+    this.createSnake();
+    this.createApple();
+    this.createBomb();
+    this.scoreText = this.add.text(16, 16, "SCORE: 0", {
       fontSize: "16px",
       color: "#fff",
       fontStyle: "400",
       fontFamily: "Montserrat",
     });
-
-    this.scoreValueText = this.add.text(80, 15, "0", {
-      fontSize: "16px",
-      color: "#fff",
-      fontFamily: "Montserrat",
-    });
-
-    this.levelText = this.add.text(300, 15, "LVL:", {
-      fontSize: "16px",
-      color: "#fff",
-      fontFamily: "Montserrat",
-    });
-
-    this.levelValueText = this.add.text(340, 15, "1", {
-      fontSize: "16px",
-      color: "#fff",
-      fontFamily: "Montserrat",
-    });
-    this.setupLevel();
-
-    this.physics.world.on("worldbounds", this.handleWorldBoundsCollision, this);
 
     this.pauseButton = this.add.image(180, 10, "pause");
     this.pauseButton.setScale(0.05);
@@ -103,18 +81,47 @@ export default class MainScene extends Phaser.Scene {
     this.pauseButton.setInteractive();
     this.pauseButton.on("pointerdown", this.togglePause, this);
 
-    // this.pausedText = this.add.text(100, 100, "PAUSED", {
-    //   fontSize: "24px",
-    //   color: "#fff",
-    //   fontFamily: "Hitchcut",
-    // });
-    // this.pausedText.setVisible(false);
-    // this.pausedText.setDepth(1);
+    this.physics.add.collider(
+      this.snake.getChildren()[0],
+      this.apple,
+      (player, apple) => {
+        if (
+          player instanceof Phaser.Physics.Arcade.Sprite &&
+          apple instanceof Phaser.Physics.Arcade.Sprite
+        ) {
+          this.eatApple(player, apple);
+        }
+      }
+    );
 
-    // Phaser.Display.Align.In.Center(
-    //   this.pausedText,
-    //   this.add.zone(180, 320, 360, 640)
-    // );
+    this.physics.add.collider(
+      this.snake.getChildren()[0],
+      this.bomb,
+      (player, bomb) => {
+        if (
+          player instanceof Phaser.Physics.Arcade.Sprite &&
+          bomb instanceof Phaser.Physics.Arcade.Sprite
+        ) {
+          this.hitBomb(player, bomb);
+        }
+      }
+    );
+  }
+
+  update() {
+    if (this.cursors.left.isDown || this.direction.x === -1) {
+      this.moveSnake(-10, 0);
+      this.direction.set(0);
+    } else if (this.cursors.right.isDown || this.direction.x === 1) {
+      this.moveSnake(10, 0);
+      this.direction.set(0);
+    } else if (this.cursors.up.isDown || this.direction.y === -1) {
+      this.moveSnake(0, -10);
+      this.direction.set(0);
+    } else if (this.cursors.down.isDown || this.direction.y === 1) {
+      this.moveSnake(0, 10);
+      this.direction.set(0);
+    }
   }
 
   togglePause() {
@@ -133,112 +140,113 @@ export default class MainScene extends Phaser.Scene {
     }
   }
 
-  setupLevel() {
-    const minY = 55;
-    const maxY = 295;
+  createSnake() {
+    const head = this.physics.add.sprite(160, 160, "body").setOrigin(0);
+    head.setDisplaySize(15, 15); // Scales the sprite visually to 15x15
+    // Adjust the physics body to match the new display size.
+    // The setSize parameters are the new width and height for the body.
+    // The final two parameters (offsetX and offsetY) adjust the body's position relative to the sprite's anchor.
+    head.body.setSize(15, 15, false);
+    this.snake.add(head);
+  }
 
-    // Start adding barriers from level 2 onwards
-    if (this.level >= 2) {
-      // Determine the side for the barrier
-      // Level 2 -> left, Level 3 -> right, and so on
-      const isLeftSide = this.level % 2 === 0;
-      const xPosition = isLeftSide ? 5 : 355;
+  createApple() {
+    this.apple = this.physics.add
+      .sprite(
+        Phaser.Math.Between(10, 300),
+        Phaser.Math.Between(10, 300),
+        "apple"
+      )
+      .setOrigin(0);
+    this.apple.setDisplaySize(15, 15); // Set display size
+    // Optionally adjust the physics body size if necessary
+    this.apple.body!.setSize(15, 15);
+  }
 
-      this.createBarrier(xPosition, Phaser.Math.Between(minY, maxY));
+  createBomb() {
+    this.bomb = this.physics.add
+      .sprite(
+        Phaser.Math.Between(10, 300),
+        Phaser.Math.Between(10, 300),
+        "bomb"
+      )
+      .setOrigin(0);
+    this.bomb.setDisplaySize(15, 15); // Set display size
+    // Optionally adjust the physics body size if necessary
+    this.bomb.body!.setSize(15, 15);
+  }
+
+  moveSnake(x: number, y: number) {
+    let oldHead = this.snake.getChildren()[0] as Phaser.Physics.Arcade.Sprite;
+    let newHead = this.physics.add
+      .sprite(oldHead.x + x, oldHead.y + y, "body")
+      .setOrigin(0);
+
+    if (this.checkCollision(newHead)) {
+      this.endGame();
+      return;
+    }
+
+    this.snake.add(newHead);
+    oldHead.destroy();
+
+    if (newHead.x === this.apple.x && newHead.y === this.apple.y) {
+      this.eatApple(newHead, this.apple);
+    } else if (newHead.x === this.bomb.x && newHead.y === this.bomb.y) {
+      this.hitBomb(newHead, this.bomb);
     }
   }
 
-  createBarrier(x: number, y: number) {
-    let barrier = this.physics.add.staticSprite(x, y, "barrier");
-    barrier.setSize(10, 50);
-    barrier.setDisplaySize(10, 50);
-    barrier.setOrigin(0.5, 0.5);
-    // Delayed call to enable collider
-    this.time.delayedCall(500, () => {
-      this.physics.add.collider(this.ball, barrier, () => {
-        console.log(`Collision with barrier at (${x}, ${y}) detected`);
-        this.endGame();
-      });
-    });
+  checkCollision(newHead: Phaser.GameObjects.Sprite) {
+    return (
+      newHead.x < 0 ||
+      newHead.x >= 400 ||
+      newHead.y < 0 ||
+      newHead.y >= 300 ||
+      Phaser.Actions.GetFirst(
+        this.snake.getChildren(),
+        { x: newHead.x, y: newHead.y },
+        1
+      )
+    );
+  }
+  eatApple(
+    player: Phaser.Physics.Arcade.Sprite,
+    apple: Phaser.Physics.Arcade.Sprite
+  ) {
+    this.score += 1;
+    this.scoreText.setText("Score: " + this.score);
+    this.apple.destroy();
+    this.createApple();
+
+    let tail = this.snake.getChildren()[
+      this.snake.getChildren().length - 1
+    ] as Phaser.Physics.Arcade.Sprite;
+
+    let newSegment = this.physics.add
+      .sprite(tail.x, tail.y, "body")
+      .setOrigin(0);
+    newSegment.setDisplaySize(15, 15);
+    newSegment.body.setSize(15, 15, false);
+
+    this.snake.add(newSegment);
   }
 
-  handleBarrierCollision(
-    ball: Phaser.GameObjects.GameObject,
-    barrier: Phaser.GameObjects.GameObject
+  hitBomb(
+    player: Phaser.Physics.Arcade.Sprite,
+    bomb: Phaser.Physics.Arcade.Sprite
   ) {
-    // Handle collision between ball and barrier
-    console.log("Collision with barrier detected");
     this.endGame();
   }
 
-  handleWorldBoundsCollision(
-    body: Phaser.Physics.Arcade.Body,
-    up: boolean,
-    down: boolean,
-    left: boolean,
-    right: boolean
-  ) {
-    // Increment score and change direction when hitting left or right walls
-    if (!this.gameOver && (left || right)) {
-      if (this.canIncrementScore) {
-        this.score += 1;
-        this.scoreValueText.setText(`${this.score}`);
-        this.canIncrementScore = false; // Reset the flag after incrementing the score
-
-        // Increase the level every three scores
-        if (this.score % 3 === 0) {
-          this.level++;
-          this.levelValueText.setText(`${this.level}`);
-          this.setupLevel();
-        }
-      }
-
-      this.ballVelocityX *= -1;
-      this.ball.setVelocityX(this.ballVelocityX);
-    }
-
-    console.log("World bounds collision: ", { up, down, left, right });
-
-    // End the game only if the ball touches the top or bottom bounds
-    if ((up || down) && !this.gameOver) {
-      this.endGame();
-    }
-  }
-
-  flap(pointer: Phaser.Input.Pointer) {
-    if (this.ball.body) {
-      // Move up
-      this.ball.setVelocityY(-350);
-
-      // Determine tap position relative to the ball
-      const tapPosition = pointer.x;
-      const ballPosition = this.ball.x;
-
-      // Move to the right if tapped on the left of the ball, and to the left if tapped on the right of the ball
-      if (tapPosition < ballPosition) {
-        // Ensure positive velocity to move right
-        this.ball.setVelocityX(Math.abs(this.ballVelocityX));
-      } else {
-        // Ensure negative velocity to move left
-        this.ball.setVelocityX(-Math.abs(this.ballVelocityX));
-      }
-      this.canIncrementScore = true; // Allow score increment on next collision
-    }
-  }
-
   endGame() {
-    this.gameOver = true;
     this.physics.pause();
-    this.ball.setVelocity(0, 0);
-    this.ball.setVisible(false);
-
-    // Transition to Game Over Scene
-    this.scene.start("GameOverScene", { score: this.score });
-  }
-
-  update() {
-    if (this.gameOver) return;
-
-    // Additional logic can be added here if needed
+    this.snake
+      .getChildren()
+      .forEach((part) => (part as Phaser.GameObjects.Sprite).setVisible(false));
+    this.add.text(100, 150, "Game Over", { fontSize: "32px", color: "#FFF" });
+    if (this.input.keyboard) {
+      this.input.keyboard.shutdown();
+    }
   }
 }
