@@ -29,7 +29,7 @@ export default function HomePage() {
   };
 
   return (
-    <Box bg="red">
+    <Box bg="black">
       <Header onConnect={handleConnect} authStatus={authStatus} />
       <PhaserGameWrapper />
       <Footer />

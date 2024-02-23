@@ -56,17 +56,28 @@ export default class MainScene extends Phaser.Scene {
 
   create() {
     this.cameras.main.setBackgroundColor("#000000");
+    this.input.keyboard!.enabled = true; // Ensure the keyboard plugin is enabled.
+
+    // Make the game canvas focusable and give it focus.
+    this.game.canvas.setAttribute("tabindex", "0");
+    this.game.canvas.focus();
+
+    // Optionally, prevent the canvas from losing focus to other page elements.
+    this.game.canvas.addEventListener("mousedown", (event) => {
+      this.game.canvas.focus();
+      event.preventDefault();
+    });
 
     this.cursors = this.input.keyboard!.createCursorKeys();
 
-    this.input.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
-      this.touchStart.set(pointer.x, pointer.y);
-    });
+    // this.input.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
+    //   this.touchStart.set(pointer.x, pointer.y);
+    // });
 
-    this.input.on("pointerup", (pointer: Phaser.Input.Pointer) => {
-      this.touchEnd.set(pointer.x, pointer.y);
-      this.calculateSwipeDirection();
-    });
+    // this.input.on("pointerup", (pointer: Phaser.Input.Pointer) => {
+    //   this.touchEnd.set(pointer.x, pointer.y);
+    //   this.calculateSwipeDirection();
+    // });
 
     this.createSnake();
     this.createApple();

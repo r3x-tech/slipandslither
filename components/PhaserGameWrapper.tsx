@@ -17,13 +17,10 @@ import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { saveHighScore } from "../utils/supabase";
 import { useScoreStore } from "../stores/useScoreStore";
 import { useLoadingStore } from "../stores/useLoadingStore";
-import { Leaderboard } from "./Leaderboard";
-import { Tournaments } from "./Tournaments";
 import { useLoginModalStore } from "@/stores/useLoginModalStore";
 import userStore from "@/stores/userStore";
 import { useScoreSavedModalStore } from "@/stores/useScoreSavedModalStore";
 import toast from "react-hot-toast";
-import { CustomizeModal } from "./CustomizeModal";
 
 const PhaserGame = dynamic(() => import("./PhaserGameComponent"), {
   ssr: false,
@@ -112,7 +109,6 @@ export default function PhaserGameWrapper() {
       w="100%"
       pt={2}
       fontFamily="'Montserrat', sans-serif"
-      bg="blue"
     >
       <Modal
         isOpen={showGameOverModal}
@@ -128,9 +124,9 @@ export default function PhaserGameWrapper() {
           borderRadius="0"
           mt="3rem"
           py="10px"
-          w="360px"
-          h="360px"
-          // onClick={stopPropagation}
+          w="362px"
+          h="362px"
+          onClick={stopPropagation}
         >
           <ModalFooter>
             <VStack spacing="25px" width="360px">
@@ -192,7 +188,7 @@ export default function PhaserGameWrapper() {
           </ModalFooter>
         </ModalContent>
       </Modal>
-      <PhaserGame />
+      {/* <PhaserGame /> */}
     </Flex>
   );
 }
