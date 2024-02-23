@@ -342,7 +342,8 @@ export const LoginComponent = () => {
               userInfo = particle.auth.getUserInfo();
             }
 
-            if (!userInfo) {
+            const currentUserInfo = userInfo;
+            if (!currentUserInfo) {
               throw Error("User unavailable");
             }
 
@@ -364,7 +365,7 @@ export const LoginComponent = () => {
                 userStore.setState({
                   loggedIn: true,
                   loginType: "PHONE",
-                  username: userInfo!.google_email || "",
+                  username: currentUserInfo.google_email || "",
                   solana_wallet_address:
                     solanaWallet.publicKey?.toBase58() || "",
                   currentConnection: particle.solana.getRpcUrl()
@@ -431,7 +432,15 @@ export const LoginComponent = () => {
   const handleLogout = async () => {
     try {
       setLogoutStatus(true);
-      if (particle && (await particle.auth.isLogin())) {
+
+      console.log("particle.auth.isLogin(): ", particle!.auth.isLogin());
+      console.log("particle: ", particle!);
+
+      console.log("publicKey: ", publicKey);
+      console.log("connected: ", connected!);
+      console.log("loggedIn: ", loggedIn!);
+
+      if (particle && particle.auth.isLogin()) {
         particle.auth.logout().then(() => {
           console.log("logout");
         });
@@ -440,13 +449,46 @@ export const LoginComponent = () => {
           loginType: "",
           username: "",
           solana_wallet_address: "",
+          currentConnection: null,
+          signTransaction: null,
+          signAllTransactions: null,
+          currentProvider: null,
+          currentWallet: null,
         });
         toast.success("Logged out");
         setLogoutStatus(false);
         // setIsOpen(false);
         // router.push("/");
+      } else if (
+        publicKey &&
+        connected &&
+        loggedIn &&
+        userStore.getState().loginType == "SOLANA"
+      ) {
+        await disconnect()
+          .catch((error) => {
+            // Silently catch because any errors are caught by the context `onError` handler
+            console.error("Disconnect error: ", error);
+            throw Error("Disconnect error");
+          })
+          .then(() => {
+            userStore.setState({
+              loggedIn: false,
+              loginType: "",
+              username: "",
+              solana_wallet_address: "",
+              currentConnection: null,
+              signTransaction: null,
+              signAllTransactions: null,
+              currentProvider: null,
+              currentWallet: null,
+            });
+            toast.success("Logged out");
+            setLogoutStatus(false);
+          });
       } else {
         toast.error("Failed to logout! 0x1");
+        setLogoutStatus(false);
         return;
       }
     } catch (e) {
@@ -484,7 +526,9 @@ export const LoginComponent = () => {
           cursor="pointer"
         >
           {loggedInStatus
-            ? `${username.slice(0, 10)}...`
+            ? `${username.slice(0, 5)}...${username.substring(
+                username.length - 5
+              )}`
             : loginInProgress || (connecting && !loggedInStatus)
             ? "LOGGING IN..."
             : "LOGIN"}
