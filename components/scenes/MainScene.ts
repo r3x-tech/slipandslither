@@ -138,11 +138,11 @@ export default class MainScene extends Phaser.Scene {
       callbackScope: this,
       loop: true,
     });
-    this.physics.world.createDebugGraphic();
+    // this.physics.world.createDebugGraphic();
 
-    // Optionally, for more detailed debug graphics, you can adjust the debug body settings:
-    this.physics.world.drawDebug = true;
-    this.physics.world.debugGraphic.clear(); // Clear previous frames
+    // // Optionally, for more detailed debug graphics, you can adjust the debug body settings:
+    // this.physics.world.drawDebug = true;
+    // this.physics.world.debugGraphic.clear(); // Clear previous frames
   }
 
   update() {
