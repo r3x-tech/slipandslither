@@ -57,24 +57,16 @@ export default class MainScene extends Phaser.Scene {
   create() {
     this.cameras.main.setBackgroundColor("#000000");
 
-    this.isMobile =
-      this.sys.game.device.os.android ||
-      this.sys.game.device.os.iOS ||
-      this.sys.game.device.os.iPad ||
-      this.sys.game.device.os.iPhone;
-
     this.cursors = this.input.keyboard!.createCursorKeys();
 
-    if (this.isMobile) {
-      this.input.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
-        this.touchStart.set(pointer.x, pointer.y);
-      });
+    this.input.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
+      this.touchStart.set(pointer.x, pointer.y);
+    });
 
-      this.input.on("pointerup", (pointer: Phaser.Input.Pointer) => {
-        this.touchEnd.set(pointer.x, pointer.y);
-        this.calculateSwipeDirection();
-      });
-    }
+    this.input.on("pointerup", (pointer: Phaser.Input.Pointer) => {
+      this.touchEnd.set(pointer.x, pointer.y);
+      this.calculateSwipeDirection();
+    });
 
     this.createSnake();
     this.createApple();
@@ -145,24 +137,25 @@ export default class MainScene extends Phaser.Scene {
     // this.physics.world.debugGraphic.clear(); // Clear previous frames
   }
 
+  private handleKeyboardControls() {
+    if (this.cursors.left.isDown && this.direction.x === 0) {
+      this.direction.x = -1;
+      this.direction.y = 0;
+    } else if (this.cursors.right.isDown && this.direction.x === 0) {
+      this.direction.x = 1;
+      this.direction.y = 0;
+    } else if (this.cursors.up.isDown && this.direction.y === 0) {
+      this.direction.x = 0;
+      this.direction.y = -1;
+    } else if (this.cursors.down.isDown && this.direction.y === 0) {
+      this.direction.x = 0;
+      this.direction.y = 1;
+    }
+  }
+
   update() {
     if (this.paused || this.gameOver) return;
-
-    if (!this.isMobile) {
-      if (this.cursors.left.isDown && this.direction.x === 0) {
-        this.direction.x = -1;
-        this.direction.y = 0;
-      } else if (this.cursors.right.isDown && this.direction.x === 0) {
-        this.direction.x = 1;
-        this.direction.y = 0;
-      } else if (this.cursors.up.isDown && this.direction.y === 0) {
-        this.direction.x = 0;
-        this.direction.y = -1;
-      } else if (this.cursors.down.isDown && this.direction.y === 0) {
-        this.direction.x = 0;
-        this.direction.y = 1;
-      }
-    }
+    this.handleKeyboardControls();
   }
 
   togglePause() {

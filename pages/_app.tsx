@@ -14,17 +14,17 @@ const queryClient = new QueryClient();
 
 function App({ Component, pageProps }: AppProps) {
   return (
-    <ParticleContextProvider>
+    <ChakraProvider theme={theme}>
       <SolanaProvider>
-        <ChakraProvider theme={theme}>
+        <ParticleContextProvider>
           <QueryClientProvider client={queryClient}>
             <Component {...pageProps} />
             <Analytics />
             <Toaster />
           </QueryClientProvider>
-        </ChakraProvider>
+        </ParticleContextProvider>
       </SolanaProvider>
-    </ParticleContextProvider>
+    </ChakraProvider>
   );
 }
 

@@ -112,6 +112,7 @@ export default function PhaserGameWrapper() {
       w="100%"
       pt={2}
       fontFamily="'Montserrat', sans-serif"
+      bg="blue"
     >
       <Modal
         isOpen={showGameOverModal}
@@ -127,9 +128,9 @@ export default function PhaserGameWrapper() {
           borderRadius="0"
           mt="3rem"
           py="10px"
-          w="362px"
-          h="362px"
-          onClick={stopPropagation}
+          w="360px"
+          h="360px"
+          // onClick={stopPropagation}
         >
           <ModalFooter>
             <VStack spacing="25px" width="360px">

@@ -33,8 +33,9 @@ const Header = ({
     justifyContent="center"
     alignItems="flex-end"
     minHeight="40px"
-    bg={theme.colors.black}
+    // bg={theme.colors.black}
     mt="0rem"
+    bg="green"
   >
     <Flex
       justifyContent="space-between"

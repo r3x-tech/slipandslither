@@ -13,7 +13,7 @@ export const Footer = () => (
   //     <Image src="../assets/poweredby.svg" h="1.5rem" alt="POWERED BY REX" />
   //   </Flex>
   // </Flex>
-  <Flex w="100%" justifyContent="center">
+  <Flex w="100%" justifyContent="center" bg="pink">
     <Flex w="360px" justifyContent="space-between">
       <Box
         textAlign="center"
