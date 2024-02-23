@@ -20,11 +20,11 @@ export default class MainScene extends Phaser.Scene {
     const absDy = Math.abs(dy);
 
     if (absDx > absDy) {
-      this.direction.x = dx > 0 ? 1 : -1;
+      this.direction.x = dx > 0 ? 0.1 : -0.1;
       this.direction.y = 0;
     } else {
       this.direction.x = 0;
-      this.direction.y = dy > 0 ? 1 : -1;
+      this.direction.y = dy > 0 ? 0.1 : -0.1;
     }
   }
 
@@ -38,6 +38,8 @@ export default class MainScene extends Phaser.Scene {
   init() {
     this.snake = this.add.group();
     this.score = 0;
+    this.gameOver = false;
+    this.paused = false;
   }
 
   preload() {
@@ -47,8 +49,6 @@ export default class MainScene extends Phaser.Scene {
   }
 
   create() {
-    this.physics.world.createDebugGraphic();
-
     this.cameras.main.setBackgroundColor("#000000"); // Set the camera background to black
 
     if (this.input.keyboard) {
@@ -73,7 +73,7 @@ export default class MainScene extends Phaser.Scene {
       fontFamily: "Montserrat",
     });
 
-    this.pauseButton = this.add.image(180, 10, "pause");
+    this.pauseButton = this.add.image(30, 16, "PAUSE");
     this.pauseButton.setScale(0.05);
     this.pauseButton.setDepth(1);
     this.pauseButton.setOrigin(0, 0);
@@ -108,10 +108,10 @@ export default class MainScene extends Phaser.Scene {
     );
     // Choose a random start direction
     const directions = [
-      { x: 0, y: -10 }, // Up
-      { x: 0, y: 10 }, // Down
-      { x: -10, y: 0 }, // Left
-      { x: 10, y: 0 }, // Right
+      { x: 0, y: -0.1 }, // Up
+      { x: 0, y: 0.1 }, // Down
+      { x: -0.1, y: 0 }, // Left
+      { x: 0.1, y: 0 }, // Right
     ];
     const startDirection =
       directions[Math.floor(Math.random() * directions.length)];
@@ -120,7 +120,7 @@ export default class MainScene extends Phaser.Scene {
 
     // Continuously move the snake
     this.time.addEvent({
-      delay: 100,
+      delay: 20,
       callback: this.moveSnake,
       args: [this.direction.x, this.direction.y],
       callbackScope: this,
@@ -130,17 +130,17 @@ export default class MainScene extends Phaser.Scene {
 
   update() {
     if (this.cursors.left.isDown && this.direction.x === 0) {
-      this.direction.x = -10;
+      this.direction.x = -0.1;
       this.direction.y = 0;
     } else if (this.cursors.right.isDown && this.direction.x === 0) {
-      this.direction.x = 10;
+      this.direction.x = 0.1;
       this.direction.y = 0;
     } else if (this.cursors.up.isDown && this.direction.y === 0) {
       this.direction.x = 0;
-      this.direction.y = -10;
+      this.direction.y = -0.1;
     } else if (this.cursors.down.isDown && this.direction.y === 0) {
       this.direction.x = 0;
-      this.direction.y = 10;
+      this.direction.y = 0.1;
     }
   }
 
@@ -178,6 +178,7 @@ export default class MainScene extends Phaser.Scene {
         "apple"
       )
       .setOrigin(0);
+
     this.apple.setDisplaySize(15, 15); // Set display size
     // Optionally adjust the physics body size if necessary
     this.apple.body!.setSize(15, 15);
