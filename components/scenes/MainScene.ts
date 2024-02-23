@@ -106,21 +106,41 @@ export default class MainScene extends Phaser.Scene {
         }
       }
     );
+    // Choose a random start direction
+    const directions = [
+      { x: 0, y: -10 }, // Up
+      { x: 0, y: 10 }, // Down
+      { x: -10, y: 0 }, // Left
+      { x: 10, y: 0 }, // Right
+    ];
+    const startDirection =
+      directions[Math.floor(Math.random() * directions.length)];
+    this.direction.x = startDirection.x;
+    this.direction.y = startDirection.y;
+
+    // Continuously move the snake
+    this.time.addEvent({
+      delay: 100,
+      callback: this.moveSnake,
+      args: [this.direction.x, this.direction.y],
+      callbackScope: this,
+      loop: true,
+    });
   }
 
   update() {
-    if (this.cursors.left.isDown || this.direction.x === -1) {
-      this.moveSnake(-10, 0);
-      this.direction.set(0);
-    } else if (this.cursors.right.isDown || this.direction.x === 1) {
-      this.moveSnake(10, 0);
-      this.direction.set(0);
-    } else if (this.cursors.up.isDown || this.direction.y === -1) {
-      this.moveSnake(0, -10);
-      this.direction.set(0);
-    } else if (this.cursors.down.isDown || this.direction.y === 1) {
-      this.moveSnake(0, 10);
-      this.direction.set(0);
+    if (this.cursors.left.isDown && this.direction.x === 0) {
+      this.direction.x = -10;
+      this.direction.y = 0;
+    } else if (this.cursors.right.isDown && this.direction.x === 0) {
+      this.direction.x = 10;
+      this.direction.y = 0;
+    } else if (this.cursors.up.isDown && this.direction.y === 0) {
+      this.direction.x = 0;
+      this.direction.y = -10;
+    } else if (this.cursors.down.isDown && this.direction.y === 0) {
+      this.direction.x = 0;
+      this.direction.y = 10;
     }
   }
 
@@ -176,25 +196,54 @@ export default class MainScene extends Phaser.Scene {
     this.bomb.body!.setSize(15, 15);
   }
 
-  moveSnake(x: number, y: number) {
+  moveSnake() {
     let oldHead = this.snake.getChildren()[0] as Phaser.Physics.Arcade.Sprite;
-    let newHead = this.physics.add
-      .sprite(oldHead.x + x, oldHead.y + y, "body")
-      .setOrigin(0);
+    let newX = oldHead.x + this.direction.x * 15; // Assuming each segment is 15x15 pixels
+    let newY = oldHead.y + this.direction.y * 15;
 
-    if (this.checkCollision(newHead)) {
+    // Ensure the game config dimensions are treated as numbers
+    let gameWidth = Number(this.sys.game.config.width);
+    let gameHeight = Number(this.sys.game.config.height);
+
+    // Check collision with world bounds using the coerced number types
+    if (newX < 0 || newX >= gameWidth || newY < 0 || newY >= gameHeight) {
       this.endGame();
       return;
     }
 
-    this.snake.add(newHead);
-    oldHead.destroy();
+    // Check collision with the snake's own body
+    let hitBody = this.snake.getChildren().some((segment, index) => {
+      if (index === 0) return false; // Skip the head
+      let s = segment as Phaser.Physics.Arcade.Sprite; // Type assertion
+      return s.x === newX && s.y === newY;
+    });
 
-    if (newHead.x === this.apple.x && newHead.y === this.apple.y) {
-      this.eatApple(newHead, this.apple);
-    } else if (newHead.x === this.bomb.x && newHead.y === this.bomb.y) {
-      this.hitBomb(newHead, this.bomb);
+    if (hitBody) {
+      this.endGame();
+      return;
     }
+
+    // Prepare new positions for all segments
+    let newPositions = this.snake.getChildren().map((segment) => {
+      return {
+        x: (segment as Phaser.Physics.Arcade.Sprite).x,
+        y: (segment as Phaser.Physics.Arcade.Sprite).y,
+      };
+    });
+
+    // Shift positions for all segments to the next one in the array
+    for (let i = this.snake.getChildren().length - 1; i > 0; i--) {
+      (this.snake.getChildren()[i] as Phaser.Physics.Arcade.Sprite).setPosition(
+        newPositions[i - 1].x,
+        newPositions[i - 1].y
+      );
+    }
+
+    // Move the head to the new position
+    oldHead.setPosition(newX, newY);
+
+    // Handle apple collision here if needed
+    // Handle bomb collision here if needed
   }
 
   checkCollision(newHead: Phaser.GameObjects.Sprite) {
@@ -240,13 +289,14 @@ export default class MainScene extends Phaser.Scene {
   }
 
   endGame() {
+    this.gameOver = true;
     this.physics.pause();
     this.snake
       .getChildren()
       .forEach((part) => (part as Phaser.GameObjects.Sprite).setVisible(false));
-    this.add.text(100, 150, "Game Over", { fontSize: "32px", color: "#FFF" });
     if (this.input.keyboard) {
       this.input.keyboard.shutdown();
     }
+    this.scene.start("GameOverScene", { score: this.score });
   }
 }
