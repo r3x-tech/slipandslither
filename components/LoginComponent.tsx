@@ -359,13 +359,15 @@ export const LoginComponent = () => {
               throw Error("Signing unavailable 0x2");
             }
 
+            console.log("phone: ", currentUserInfo.phone);
+
             fetch("https://api.ipify.org?format=json")
               .then((response) => response.json())
               .then((data) => {
                 userStore.setState({
                   loggedIn: true,
                   loginType: "PHONE",
-                  username: currentUserInfo.google_email || "",
+                  username: currentUserInfo.phone || "",
                   solana_wallet_address:
                     solanaWallet.publicKey?.toBase58() || "",
                   currentConnection: particle.solana.getRpcUrl()
@@ -458,7 +460,7 @@ export const LoginComponent = () => {
         toast.success("Logged out");
         setLogoutStatus(false);
         // setIsOpen(false);
-        // router.push("/");
+        router.push("/");
       } else if (
         publicKey &&
         connected &&
@@ -527,7 +529,7 @@ export const LoginComponent = () => {
         >
           {loggedInStatus
             ? `${username.slice(0, 5)}...${username.substring(
-                username.length - 5
+                username.length - 4
               )}`
             : loginInProgress || (connecting && !loggedInStatus)
             ? "LOGGING IN..."

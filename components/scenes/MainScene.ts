@@ -136,11 +136,11 @@ export default class MainScene extends Phaser.Scene {
       callbackScope: this,
       loop: true,
     });
-    this.physics.world.createDebugGraphic();
+    // this.physics.world.createDebugGraphic();
 
-    // Optionally, for more detailed debug graphics, you can adjust the debug body settings:
-    this.physics.world.drawDebug = true;
-    this.physics.world.debugGraphic.clear(); // Clear previous frames
+    // // Optionally, for more detailed debug graphics, you can adjust the debug body settings:
+    // this.physics.world.drawDebug = true;
+    // this.physics.world.debugGraphic.clear(); // Clear previous frames
   }
 
   update() {
@@ -324,28 +324,34 @@ export default class MainScene extends Phaser.Scene {
     if (this.direction.x > 0) {
       // Moving right
       console.log("newSegmentX: ", newSegmentX);
-      newSegmentX -= 1500; // Place the new segment to the left of the last segment
+      newSegmentX -= 500; // Place the new segment to the left of the last segment
+      console.log("newSegmentX after: ", newSegmentX);
     } else if (this.direction.x < 0) {
       // Moving left
       console.log("newSegmentX: ", newSegmentX);
 
-      newSegmentX += 1500; // Place the new segment to the right of the last segment
+      newSegmentX += 500; // Place the new segment to the right of the last segment
+      console.log("newSegmentX after: ", newSegmentX);
     } else if (this.direction.y > 0) {
       // Moving down
       console.log("newSegmentY: ", newSegmentY);
 
-      newSegmentY -= 1500; // Place the new segment above the last segment
+      newSegmentY -= 500; // Place the new segment above the last segment
+      console.log("newSegmentY after: ", newSegmentY);
     } else if (this.direction.y < 0) {
       // Moving up
       console.log("newSegmentY: ", newSegmentY);
 
-      newSegmentY += 1500; // Place the new segment below the last segment
+      newSegmentY += 500; // Place the new segment below the last segment
+      console.log("newSegmentY after: ", newSegmentY);
     }
 
     // Create and add the new segment at the calculated position
     const newSegment = this.physics.add
       .sprite(newSegmentX, newSegmentY, "body")
       .setOrigin(0);
+
+    console.log("newSegment: ", newSegment.getCenter);
     newSegment.setDisplaySize(15, 15);
     // Set the physics body size to match the display size or whatever size gives correct physics behavior
     newSegment.body.setSize(500, 500); // Adjust if necessary based on actual behavior

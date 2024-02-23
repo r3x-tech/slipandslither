@@ -51,9 +51,9 @@ export default function PhaserGameWrapper() {
         "SWA in saveHighscore is: ",
         userStore.getState().solana_wallet_address
       );
-      console.log("HERE");
+      // console.log("HERE");
       setShowGameOverModal(false);
-      console.log("YESSS");
+      // console.log("YESSS");
       console.log("show modal in saveHighscore is: ", showGameOverModal);
       useScoreStore.getState().setScore(score);
       useLoginModalStore.getState().setShowLoginModal(true);

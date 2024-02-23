@@ -91,9 +91,9 @@ export function Leaderboard() {
                       <Box width="100%" ml={1} p={3} backgroundColor="#1A1A1D">
                         <Flex justifyContent="space-between" width="100%">
                           <Text fontSize="14px" color="white">
-                            {score.user.slice(0, 3) +
+                            {score.user.slice(0, 5) +
                               "..." +
-                              score.user.slice(-5)}
+                              score.user.slice(-3)}
                           </Text>
                           <Text fontSize="14px" color="white">
                             {score.score}
