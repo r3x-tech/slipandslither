@@ -12,7 +12,9 @@ export default function Document() {
         href="https://fonts.googleapis.com/css2?family=PT+Mono&display=swap"
         rel="stylesheet"
       />
-      <body style={{ backgroundColor: "black" }}>
+      <body
+        style={{ backgroundColor: "black", height: "100vh", width: "100vw" }}
+      >
         <Main />
         <NextScript />
       </body>
