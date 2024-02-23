@@ -194,23 +194,29 @@ export default class MainScene extends Phaser.Scene {
 
   createApple() {
     let newApplePosition: Phaser.Math.Vector2;
-    let isPositionOnSnake: boolean;
+    let isPositionInvalid: boolean;
     do {
       const appleX = Phaser.Math.Between(
         20,
         Number(this.sys.game.config.width) - 20
       );
       const appleY = Phaser.Math.Between(
-        20,
+        60, // Assuming the pause button and score text are within 50 pixels from the top
         Number(this.sys.game.config.height) - 20
       );
+
       newApplePosition = new Phaser.Math.Vector2(appleX, appleY);
 
-      isPositionOnSnake = this.snake.getChildren().some((segment) => {
-        const seg = segment as Phaser.Physics.Arcade.Sprite;
-        return newApplePosition.x === seg.x && newApplePosition.y === seg.y;
-      });
-    } while (isPositionOnSnake);
+      // Check if the new position collides with any part of the snake
+      isPositionInvalid =
+        this.snake.getChildren().some((segment) => {
+          const seg = segment as Phaser.Physics.Arcade.Sprite;
+          return newApplePosition.x === seg.x && newApplePosition.y === seg.y;
+        }) ||
+        (this.bomb &&
+          Math.abs(newApplePosition.x - this.bomb.x) < 20 &&
+          Math.abs(newApplePosition.y - this.bomb.y) < 20); // Ensure apple is not overlapping with bomb
+    } while (isPositionInvalid);
 
     if (this.apple) {
       this.apple.destroy();
@@ -221,18 +227,19 @@ export default class MainScene extends Phaser.Scene {
       .setOrigin(0);
     this.apple.setDisplaySize(20, 20);
     if (this.apple && this.apple.body) {
-      this.apple.body.setSize(350, 350);
+      this.apple.body.setSize(350, 350); // Adjust as necessary
     }
   }
 
   createBomb() {
     this.bomb = this.physics.add
       .sprite(
-        Phaser.Math.Between(20, 300),
-        Phaser.Math.Between(20, 300),
+        Phaser.Math.Between(20, Number(this.sys.game.config.width) - 20),
+        Phaser.Math.Between(60, Number(this.sys.game.config.height) - 20),
         "bomb"
       )
       .setOrigin(0);
+
     this.bomb.setDisplaySize(20, 20);
     if (this.bomb && this.bomb.body) {
       this.bomb.body.setSize(350, 350);
@@ -371,7 +378,7 @@ export default class MainScene extends Phaser.Scene {
     console.log("newSegment: ", newSegment.getCenter);
     newSegment.setDisplaySize(15, 15);
     // Set the physics body size to match the display size or whatever size gives correct physics behavior
-    newSegment.body.setSize(350, 350); // Adjust if necessary based on actual behavior
+    newSegment.body.setSize(400, 400); // Adjust if necessary based on actual behavior
     this.snake.add(newSegment);
   }
 
