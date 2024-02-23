@@ -24,11 +24,11 @@ export default class MainScene extends Phaser.Scene {
     const absDy = Math.abs(dy);
 
     if (absDx > absDy) {
-      this.direction.x = dx > 0 ? 0.1 : -0.1;
+      this.direction.x = dx > 0 ? 1 : -1;
       this.direction.y = 0;
     } else {
       this.direction.x = 0;
-      this.direction.y = dy > 0 ? 0.1 : -0.1;
+      this.direction.y = dy > 0 ? 1 : -1;
     }
   }
 
@@ -121,10 +121,10 @@ export default class MainScene extends Phaser.Scene {
     );
 
     const directions = [
-      { x: 0, y: -0.1 },
-      { x: 0, y: 0.1 },
-      { x: -0.1, y: 0 },
-      { x: 0.1, y: 0 },
+      { x: 0, y: -1 },
+      { x: 0, y: 1 },
+      { x: -1, y: 0 },
+      { x: 1, y: 0 },
     ];
     const startDirection =
       directions[Math.floor(Math.random() * directions.length)];
@@ -132,7 +132,7 @@ export default class MainScene extends Phaser.Scene {
     this.direction.y = startDirection.y;
 
     this.snakeMoveEvent = this.time.addEvent({
-      delay: 25,
+      delay: 150,
       callback: this.moveSnake,
       args: [this.direction.x, this.direction.y],
       callbackScope: this,
@@ -150,17 +150,17 @@ export default class MainScene extends Phaser.Scene {
 
     if (!this.isMobile) {
       if (this.cursors.left.isDown && this.direction.x === 0) {
-        this.direction.x = -0.1;
+        this.direction.x = -1;
         this.direction.y = 0;
       } else if (this.cursors.right.isDown && this.direction.x === 0) {
-        this.direction.x = 0.1;
+        this.direction.x = 1;
         this.direction.y = 0;
       } else if (this.cursors.up.isDown && this.direction.y === 0) {
         this.direction.x = 0;
-        this.direction.y = -0.1;
+        this.direction.y = -1;
       } else if (this.cursors.down.isDown && this.direction.y === 0) {
         this.direction.x = 0;
-        this.direction.y = 0.1;
+        this.direction.y = 1;
       }
     }
   }
@@ -187,7 +187,7 @@ export default class MainScene extends Phaser.Scene {
 
   createSnake() {
     const head = this.physics.add.sprite(160, 160, "body").setOrigin(0);
-    head.setDisplaySize(20, 20);
+    head.setDisplaySize(15, 15);
     head.body.setSize(400, 400); // Adjust the physics body size
     this.snake.add(head);
   }
@@ -241,8 +241,8 @@ export default class MainScene extends Phaser.Scene {
 
   moveSnake() {
     let oldHead = this.snake.getChildren()[0] as Phaser.Physics.Arcade.Sprite;
-    let newX = oldHead.x + this.direction.x * 20;
-    let newY = oldHead.y + this.direction.y * 20;
+    let newX = oldHead.x + this.direction.x * 15;
+    let newY = oldHead.y + this.direction.y * 15;
 
     let gameWidth = Number(this.sys.game.config.width);
     let gameHeight = Number(this.sys.game.config.height);
@@ -341,25 +341,25 @@ export default class MainScene extends Phaser.Scene {
     if (this.direction.x > 0) {
       // Moving right
       console.log("newSegmentX: ", newSegmentX);
-      newSegmentX -= 400; // Place the new segment to the left of the last segment
+      newSegmentX -= 350; // Place the new segment to the left of the last segment
       console.log("newSegmentX after: ", newSegmentX);
     } else if (this.direction.x < 0) {
       // Moving left
       console.log("newSegmentX: ", newSegmentX);
 
-      newSegmentX += 400; // Place the new segment to the right of the last segment
+      newSegmentX += 350; // Place the new segment to the right of the last segment
       console.log("newSegmentX after: ", newSegmentX);
     } else if (this.direction.y > 0) {
       // Moving down
       console.log("newSegmentY: ", newSegmentY);
 
-      newSegmentY -= 400; // Place the new segment above the last segment
+      newSegmentY -= 350; // Place the new segment above the last segment
       console.log("newSegmentY after: ", newSegmentY);
     } else if (this.direction.y < 0) {
       // Moving up
       console.log("newSegmentY: ", newSegmentY);
 
-      newSegmentY += 400; // Place the new segment below the last segment
+      newSegmentY += 350; // Place the new segment below the last segment
       console.log("newSegmentY after: ", newSegmentY);
     }
 
@@ -369,9 +369,9 @@ export default class MainScene extends Phaser.Scene {
       .setOrigin(0);
 
     console.log("newSegment: ", newSegment.getCenter);
-    newSegment.setDisplaySize(20, 20);
+    newSegment.setDisplaySize(15, 15);
     // Set the physics body size to match the display size or whatever size gives correct physics behavior
-    newSegment.body.setSize(400, 400); // Adjust if necessary based on actual behavior
+    newSegment.body.setSize(350, 350); // Adjust if necessary based on actual behavior
     this.snake.add(newSegment);
   }
 
