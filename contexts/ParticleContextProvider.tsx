@@ -48,8 +48,8 @@ export const ParticleContextProvider = ({
         chainId: 101, //optional: current chain id, default 1.
         wallet: {
           //optional: by default, the wallet entry is displayed in the bottom right corner of the webpage.
-          displayWalletEntry: true, //show wallet entry when connect particle.
-          defaultWalletEntryPosition: WalletEntryPosition.BR, //wallet entry position
+          displayWalletEntry: false, //show wallet entry when connect particle.
+          defaultWalletEntryPosition: WalletEntryPosition.TR, //wallet entry position
           uiMode: "dark", //optional: light or dark, if not set, the default is the same as web auth.
           supportChains: [{ id: 101, name: "Solana" }], // optional: web wallet support chains.
           customStyle: {}, //optional: custom wallet style
@@ -66,16 +66,16 @@ export const ParticleContextProvider = ({
       const currentParticleProvider = new ParticleNetworkProvider(
         particle.auth
       );
-      // if (typeof window !== "undefined") {
-      //   window.solana = particleProvider;
-      // }
+      if (typeof window !== "undefined") {
+        window.solana = particleProvider;
+      }
       const currentSolanaWallet = new SolanaWallet(particle.auth);
 
       setParticle(particle);
       setParticleProvider(currentParticleProvider);
       setSolanaWallet(currentSolanaWallet);
     }
-  }, []);
+  }, [particleProvider]);
 
   return (
     <ParticleContext.Provider

@@ -12,13 +12,10 @@ import {
 } from "@chakra-ui/react";
 import theme from "@/styles/theme";
 import { MdLeaderboard } from "react-icons/md";
-import { WalletMultiButton } from "./auth/WalletMultiButton";
-import { LoginComponent } from "./LoginComponent";
-import { Tournaments } from "./Tournaments";
+// import { LoginComponent } from "./LoginComponent";
 import { Leaderboard } from "./Leaderboard";
 import { Customize } from "./Customize";
 import { TbMoodEdit } from "react-icons/tb";
-import { SiGamejolt } from "react-icons/si";
 
 const Header = ({
   onConnect,
@@ -39,12 +36,12 @@ const Header = ({
     <Flex
       justifyContent="space-between"
       alignItems="center"
-      maxWidth="365px"
+      maxWidth="360px"
       width="100%"
     >
-      <Flex flex="2" justifyContent="flex-start">
+      {/* <Flex flex="2" justifyContent="flex-start">
         <LoginComponent />
-      </Flex>
+      </Flex> */}
       <Flex flex="1" justifyContent="center">
         <Popover placement="bottom-end">
           <PopoverTrigger>

@@ -41,7 +41,7 @@ const PhaserGameComponent = () => {
         families: ["Montserrat:100,200,300,400,500,600,700,800,900"],
       },
       active: () => {
-        // const mainScene = new MainScene();
+        const mainScene = new MainScene();
 
         const config: Phaser.Types.Core.GameConfig = {
           type: Phaser.AUTO,
@@ -55,7 +55,7 @@ const PhaserGameComponent = () => {
               debug: false,
             },
           },
-          scene: [StartScene, GameOverScene],
+          scene: [StartScene, mainScene, GameOverScene],
         };
 
         gameRef.current = new Phaser.Game(config);

@@ -21,6 +21,7 @@ import { useLoginModalStore } from "@/stores/useLoginModalStore";
 import userStore from "@/stores/userStore";
 import { useScoreSavedModalStore } from "@/stores/useScoreSavedModalStore";
 import toast from "react-hot-toast";
+import PhaserGameComponent from "./PhaserGameComponent";
 
 const PhaserGame = dynamic(() => import("./PhaserGameComponent"), {
   ssr: false,
@@ -36,6 +37,7 @@ export default function PhaserGameWrapper() {
   const score = useScoreStore((state) => state.score);
   const { showScoreSavedModal, setShowScoreSavedModal } =
     useScoreSavedModalStore();
+  const phaserCanvas = document.querySelector("#phaser-game canvas");
 
   const saveHighscore = async () => {
     useLoadingStore.getState().setLoadingStatus(true);
@@ -97,6 +99,34 @@ export default function PhaserGameWrapper() {
   const stopPropagation = (e: React.MouseEvent) => {
     e.stopPropagation();
   };
+
+  // useEffect(() => {
+  //   const handleDocumentClick = (event: any) => {
+  //     const handleDocumentClick = (event: any) => {
+  //       const phaserCanvas = document.querySelector(
+  //         "#phaser-game canvas"
+  //       ) as HTMLElement;
+  //       if (phaserCanvas && !phaserCanvas.contains(event.target as Node)) {
+  //         // Now that phaserCanvas is typed as HTMLElement, you can call blur on it
+  //         if (document.activeElement === phaserCanvas) {
+  //           phaserCanvas.blur();
+  //         }
+  //         // Or, to focus another element:
+  //         // document.getElementById('some-other-element').focus();
+  //       }
+  //     };
+
+  //     // Add event listener for clicks
+  //     document.addEventListener("click", handleDocumentClick);
+
+  //     // Optionally, handle keydown or other events similarly
+
+  //     // Cleanup event listener on component unmount
+  //     return () => {
+  //       document.removeEventListener("click", handleDocumentClick);
+  //     };
+  //   };
+  // }, []);
 
   return (
     <Flex

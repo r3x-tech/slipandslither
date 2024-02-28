@@ -13,7 +13,6 @@ import { clusterApiUrl } from "@solana/web3.js";
 import { Box, Button, Flex } from "@chakra-ui/react";
 import Header from "../components/Header";
 import PhaserGameWrapper from "../components/PhaserGameWrapper";
-import { ContextProvider } from "@/contexts/ContextProvider";
 import { Footer } from "@/components/Footer";
 require("@solana/wallet-adapter-react-ui/styles.css");
 

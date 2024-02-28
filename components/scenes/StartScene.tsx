@@ -14,9 +14,9 @@ class StartScene extends Phaser.Scene {
 
     this.game.canvas.style.cursor = "pointer";
 
-    // this.input.on("pointerdown", () => {
-    //   this.scene.start("MainScene");
-    // });
+    this.input.on("pointerdown", () => {
+      this.scene.start("MainScene");
+    });
   }
 
   shutdown() {
