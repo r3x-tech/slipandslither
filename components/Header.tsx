@@ -12,7 +12,7 @@ import {
 } from "@chakra-ui/react";
 import theme from "@/styles/theme";
 import { MdLeaderboard } from "react-icons/md";
-// import { LoginComponent } from "./LoginComponent";
+import { LoginComponent } from "./LoginComponent";
 import { Leaderboard } from "./Leaderboard";
 import { Customize } from "./Customize";
 import { TbMoodEdit } from "react-icons/tb";
@@ -39,9 +39,9 @@ const Header = ({
       maxWidth="360px"
       width="100%"
     >
-      {/* <Flex flex="2" justifyContent="flex-start">
+      <Flex flex="2" justifyContent="flex-start">
         <LoginComponent />
-      </Flex> */}
+      </Flex>
       <Flex flex="1" justifyContent="center">
         <Popover placement="bottom-end">
           <PopoverTrigger>

@@ -66,9 +66,9 @@ export const ParticleContextProvider = ({
       const currentParticleProvider = new ParticleNetworkProvider(
         particle.auth
       );
-      if (typeof window !== "undefined") {
-        window.solana = particleProvider;
-      }
+      // if (typeof window !== "undefined") {
+      //   window.solana = particleProvider;
+      // }
       const currentSolanaWallet = new SolanaWallet(particle.auth);
 
       setParticle(particle);
