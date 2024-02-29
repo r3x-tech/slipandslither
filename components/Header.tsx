@@ -30,7 +30,6 @@ const Header = ({
     justifyContent="center"
     alignItems="flex-end"
     minHeight="40px"
-    // bg={theme.colors.black}
     mt="0rem"
   >
     <Flex
