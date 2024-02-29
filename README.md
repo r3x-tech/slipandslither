@@ -1,4 +1,4 @@
-## Slip & Slither Minigame
+### Slip & Slither Minigame
 
 ## Getting Started
 
