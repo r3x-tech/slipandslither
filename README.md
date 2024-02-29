@@ -1,4 +1,5 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Slip & Slither Minigame
+Minigame built by REX using Typescript, Next.js, and Phaser. Integrated with the Solana blockchain and AI for authentication, leaderboards, and custom game asset generation. 
 
 ## Getting Started
 
