@@ -158,7 +158,7 @@ export function Customize() {
 
   const handleGenerateSnakeBodyImage = async (data: FormData) => {
     console.log("ran handleGenerateSnakeBodyImage");
-    const prompt = data.aiBombImageInput;
+    const prompt = data.aiSnakeBodyImageInput;
 
     // Validate prompt
     if (!prompt || prompt.trim().length < 2) {
