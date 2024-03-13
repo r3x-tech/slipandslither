@@ -217,7 +217,7 @@ export default function PhaserGameWrapper() {
           </ModalFooter>
         </ModalContent>
       </Modal>
-      {/* <PhaserGame /> */}
+      <PhaserGame />
     </Flex>
   );
 }

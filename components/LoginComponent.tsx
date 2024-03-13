@@ -673,7 +673,8 @@ export const LoginComponent = () => {
               </Text>
             </Flex>
           ) : (
-            <Stack
+            <>
+              {/* <Stack
               spacing={3}
               width="100%"
               p="1rem"
@@ -776,7 +777,8 @@ export const LoginComponent = () => {
                   LOGIN W/ PHONE
                 </Button>
               </Flex>
-            </Stack>
+            </Stack> */}
+            </>
           )}
         </MenuList>
       </Menu>
