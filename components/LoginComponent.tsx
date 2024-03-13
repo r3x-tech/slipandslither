@@ -249,67 +249,72 @@ export const LoginComponent = () => {
 
   const handlePhoneLogin = async () => {
     setLoginInProgress(true);
-    const cleanPhone = phone.replace(/-/g, "");
+    // const cleanPhone = phone.replace(/-/g, "");
 
     if (!loggedIn) {
-      if (!(selectedCountryCode + cleanPhone).match(/^\+\d{1,14}$/)) {
-        console.log("phone error");
-        console.log("phone: ", cleanPhone);
-        console.log("phone number: ", selectedCountryCode + cleanPhone);
+      // if (!(selectedCountryCode + cleanPhone).match(/^\+\d{1,14}$/)) {
+      //   console.log("phone error");
+      //   console.log("phone: ", cleanPhone);
+      //   console.log("phone number: ", selectedCountryCode + cleanPhone);
 
-        setPhoneError(true);
-      } else {
-        try {
-          setPhoneError(false);
-          console.log("phone: ", cleanPhone);
-          // let userInfo: UserInfo | undefined;
+      //   setPhoneError(true);
+      // } else {
 
-          // userInfo = await particleConnect({
-          //   phone: selectedCountryCode + cleanPhone,
-          // });
+      // }
+      try {
+        setPhoneError(false);
+        // console.log("phone: ", cleanPhone);
+        // let userInfo: UserInfo | undefined;
 
-          let userInfo = await particleConnect();
+        // userInfo = await particleConnect({
+        //   phone: selectedCountryCode + cleanPhone,
+        // });
 
-          if (!userInfo && userInfo != undefined) {
-            throw Error("User unavailable");
-          }
+        console.log("here:");
 
-          if (!address) {
-            throw Error("Address unavailable");
-          }
+        let userInfo = await particleConnect();
 
-          if (!signTransaction) {
-            throw Error("Signing unavailable 0x1");
-          }
+        console.log("there");
 
-          if (!signAllTransactions) {
-            throw Error("Signing unavailable 0x2");
-          }
-
-          fetch("https://api.ipify.org?format=json")
-            .then((response) => response.json())
-            .then((data) => {
-              userStore.setState({
-                loggedIn: true,
-                loginType: "PHONE",
-                username: userInfo!.phone || "",
-                solana_wallet_address: address,
-                currentWallet: {
-                  publicKey: new PublicKey(address),
-                  signTransaction: signTransaction,
-                  signAllTransactions: signAllTransactions,
-                },
-                ip_address: data.ip,
-              });
-            });
-          setPhone("");
-          toast.success("log in completed!");
-        } catch (e) {
-          console.log("login error: " + JSON.stringify(e));
-          toast.error("log in failed!");
-        } finally {
-          setLoginInProgress(false);
+        if (!userInfo && userInfo != undefined) {
+          throw Error("User unavailable");
         }
+
+        if (!address) {
+          throw Error("Address unavailable");
+        }
+
+        if (!signTransaction) {
+          throw Error("Signing unavailable 0x1");
+        }
+
+        if (!signAllTransactions) {
+          throw Error("Signing unavailable 0x2");
+        }
+
+        fetch("https://api.ipify.org?format=json")
+          .then((response) => response.json())
+          .then((data) => {
+            userStore.setState({
+              loggedIn: true,
+              loginType: "PHONE",
+              username: userInfo!.phone || "",
+              solana_wallet_address: address,
+              currentWallet: {
+                publicKey: new PublicKey(address),
+                signTransaction: signTransaction,
+                signAllTransactions: signAllTransactions,
+              },
+              ip_address: data.ip,
+            });
+          });
+        setPhone("");
+        toast.success("log in completed!");
+      } catch (e) {
+        console.log("login error: " + JSON.stringify(e));
+        toast.error("log in failed!");
+      } finally {
+        setLoginInProgress(false);
       }
     }
   };
@@ -424,7 +429,7 @@ export const LoginComponent = () => {
         });
         toast.success("Logged out");
         setLogoutStatus(false);
-        // setIsOpen(false);
+        setShowLoginModal(false);
         router.push("/");
       } else {
         toast.error("Failed to logout! 0x1");
@@ -657,22 +662,23 @@ export const LoginComponent = () => {
                 </Button>
               </Flex>
             </VStack>
-          ) : logoutStatus ? (
-            <Flex
-              w="100%"
-              flexDirection="column"
-              align="center"
-              justifyContent="center"
-              color={theme.colors.white}
-              mt="5.15rem"
-              mb="5rem"
-            >
-              <Spinner size="sm" />
-              <Text mt={3} fontSize="0.75rem" fontWeight="500">
-                LOGGING OUT
-              </Text>
-            </Flex>
           ) : (
+            // logoutStatus ? (
+            //   <Flex
+            //     w="100%"
+            //     flexDirection="column"
+            //     align="center"
+            //     justifyContent="center"
+            //     color={theme.colors.white}
+            //     mt="5.15rem"
+            //     mb="5rem"
+            //   >
+            //     <Spinner size="sm" />
+            //     <Text mt={3} fontSize="0.75rem" fontWeight="500">
+            //       LOGGING OUT
+            //     </Text>
+            //   </Flex>
+            // ) :
             <>
               {/* <Stack
               spacing={3}
