@@ -31,12 +31,6 @@ import { useEffect, useState } from "react";
 import theme from "../styles/theme";
 import userStore from "@/stores/userStore";
 import toast from "react-hot-toast";
-import { WalletMultiButton } from "@/components/auth/WalletMultiButton";
-import {
-  useAnchorWallet,
-  useConnection,
-  useWallet,
-} from "@solana/wallet-adapter-react";
 import { useRouter } from "next/router";
 import {
   getPlayersByWalletAddress,
@@ -53,7 +47,6 @@ import { useGameOverModalStore } from "@/stores/useGameOverModalStore";
 import React from "react";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { Connection, PublicKey } from "@solana/web3.js";
-import BaseWalletMultiButton from "./auth/BaseWalletMultiButton";
 import { useParticle } from "../contexts/ParticleContextProvider";
 import { UserInfo } from "@particle-network/auth";
 
@@ -94,36 +87,6 @@ export const LoginComponent = () => {
   const { showScoreSavedModal, setShowScoreSavedModal } =
     useScoreSavedModalStore();
   const [menuOpen, setMenuOpen] = useState(false);
-
-  const { connection } = useConnection();
-  const {
-    connecting,
-    connected,
-    disconnect,
-    connect,
-    publicKey,
-    disconnecting,
-    wallet,
-  } = useWallet();
-  const anchorWallet = useAnchorWallet();
-
-  let buttonState: ButtonState["buttonState"];
-  if (connecting) {
-    buttonState = "connecting";
-    // console.log("1 - CONNECTING");
-  } else if (connected) {
-    buttonState = "connected";
-    // console.log("1 - CONNECTED");
-  } else if (disconnecting) {
-    buttonState = "disconnecting";
-    // console.log("1 - DISCONNECTING");
-  } else if (wallet) {
-    buttonState = "has-wallet";
-    // console.log("1 - HAS WALLET");
-  } else {
-    buttonState = "no-wallet";
-    // console.log("1 - NO WALLET FOUND");
-  }
 
   const { setVisible: setModalVisible } = useWalletModal();
 
@@ -183,43 +146,6 @@ export const LoginComponent = () => {
   }, [loggedIn]);
 
   useEffect(() => {
-    if (publicKey && connected && !loggedIn && !logoutStatus && anchorWallet) {
-      // console.log("RUNNING SOLANA LOGIN USE EFFECT");
-      fetch("https://api.ipify.org?format=json")
-        .then((response) => response.json())
-        .then((data) => {
-          console.log(data.ip);
-          userStore.setState({
-            loggedIn: true,
-            loginType: "SOLANA",
-            username: publicKey.toString(),
-            solana_wallet_address: publicKey.toString(),
-            currentConnection: connection,
-            currentWallet: anchorWallet,
-            ip_address: data.ip,
-          });
-        });
-      setLoginInProgress(false);
-      if (loadingStatus == true && showGameOverModal == false) {
-        setShowLoginModal(false);
-        setShowGameOverModal(true);
-      }
-    }
-  }, [
-    anchorWallet,
-    connected,
-    connection,
-    loadingStatus,
-    loggedIn,
-    logoutStatus,
-    publicKey,
-    setShowGameOverModal,
-    setShowLoginModal,
-    showGameOverModal,
-    wallet,
-  ]);
-
-  useEffect(() => {
     const checkAndInsertToDatabase = async () => {
       const entry = await getPlayersByWalletAddress(solana_wallet_address);
       if (!entry) {
@@ -239,14 +165,7 @@ export const LoginComponent = () => {
       console.log("RUNNING DB CHECK");
       checkAndInsertToDatabase();
     }
-  }, [
-    connected,
-    ip_address,
-    loggedIn,
-    loginType,
-    solana_wallet_address,
-    username,
-  ]);
+  }, [ip_address, loggedIn, loginType, solana_wallet_address, username]);
 
   useEffect(() => {
     if (
@@ -396,50 +315,12 @@ export const LoginComponent = () => {
     }
   };
 
-  const handleSolanaLogin = async () => {
-    setLoginInProgress(true);
-
-    if (!loggedIn) {
-      switch (buttonState) {
-        case "no-wallet":
-          setModalVisible(true);
-          console.log("RAN NO WALLET");
-          setLoginInProgress(false);
-          break;
-        case "has-wallet":
-          await connect().catch((error) => {
-            // Silently catch because any errors are caught by the context `onError` handler
-            console.error("Connect error: ", error);
-          });
-          if (connect) {
-            await connect().catch((error) => {
-              // Silently catch because any errors are caught by the context `onError` handler
-              console.error("Connect error: ", error);
-            });
-          }
-          break;
-        case "connected":
-          console.log("BWM connected!!!!");
-          setMenuOpen(!menuOpen);
-          break;
-        case "connecting":
-          console.log("BWM connecting!");
-          // You can add additional logic here if needed
-          break;
-        // ... add any additional cases if required
-      }
-    }
-  };
-
   const handleLogout = async () => {
     try {
       setLogoutStatus(true);
 
       console.log("particle.auth.isLogin(): ", particle!.auth.isLogin());
       console.log("particle: ", particle!);
-
-      console.log("publicKey: ", publicKey);
-      console.log("connected: ", connected!);
       console.log("loggedIn: ", loggedIn!);
 
       if (particle && particle.auth.isLogin()) {
@@ -461,33 +342,6 @@ export const LoginComponent = () => {
         setLogoutStatus(false);
         // setIsOpen(false);
         router.push("/");
-      } else if (
-        publicKey &&
-        connected &&
-        loggedIn &&
-        userStore.getState().loginType == "SOLANA"
-      ) {
-        await disconnect()
-          .catch((error) => {
-            // Silently catch because any errors are caught by the context `onError` handler
-            console.error("Disconnect error: ", error);
-            throw Error("Disconnect error");
-          })
-          .then(() => {
-            userStore.setState({
-              loggedIn: false,
-              loginType: "",
-              username: "",
-              solana_wallet_address: "",
-              currentConnection: null,
-              signTransaction: null,
-              signAllTransactions: null,
-              currentProvider: null,
-              currentWallet: null,
-            });
-            toast.success("Logged out");
-            setLogoutStatus(false);
-          });
       } else {
         toast.error("Failed to logout! 0x1");
         setLogoutStatus(false);
