@@ -13,17 +13,17 @@ import {
   useSolana,
 } from "@particle-network/auth-core-modal";
 
-// const NoSSRAuthCoreContextProvider = dynamic(
-//   async () =>
-//     (await import("@particle-network/auth-core-modal")).AuthCoreContextProvider,
-//   { ssr: false }
-// );
-
-// Dynamically import to avoid SSR issues
 const NoSSRAuthCoreContextProvider = dynamic(
-  () => Promise.resolve(AuthCoreContextProvider),
+  async () =>
+    (await import("@particle-network/auth-core-modal")).AuthCoreContextProvider,
   { ssr: false }
 );
+
+// Dynamically import to avoid SSR issues
+// const NoSSRAuthCoreContextProvider = dynamic(
+//   () => Promise.resolve(AuthCoreContextProvider),
+//   { ssr: false }
+// );
 
 require("@solana/wallet-adapter-react-ui/styles.css");
 

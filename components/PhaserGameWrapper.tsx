@@ -96,9 +96,9 @@ export default function PhaserGameWrapper() {
     }
   }, [walletAddress, score, loadingStatus, setShowScoreSavedModal]);
 
-  const stopPropagation = (e: React.MouseEvent) => {
-    e.stopPropagation();
-  };
+  // const stopPropagation = (e: React.MouseEvent) => {
+  //   e.stopPropagation();
+  // };
 
   // useEffect(() => {
   //   const handleDocumentClick = (event: any) => {
@@ -156,7 +156,7 @@ export default function PhaserGameWrapper() {
           py="10px"
           w="362px"
           h="362px"
-          onClick={stopPropagation}
+          // onClick={stopPropagation}
         >
           <ModalFooter>
             <VStack spacing="25px" width="360px">
@@ -218,7 +218,7 @@ export default function PhaserGameWrapper() {
           </ModalFooter>
         </ModalContent>
       </Modal>
-      <PhaserGame />
+      {/* <PhaserGame /> */}
     </Flex>
   );
 }

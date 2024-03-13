@@ -48,6 +48,7 @@ import React from "react";
 import { Connection, PublicKey } from "@solana/web3.js";
 import { useConnect, useSolana } from "@particle-network/auth-core-modal";
 import { UserInfo } from "@particle-network/auth-core";
+import { AnchorProvider } from "@project-serum/anchor";
 
 const LABELS = {
   "change-wallet": "CHANGE WALLET",
