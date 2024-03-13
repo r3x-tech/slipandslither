@@ -19,14 +19,14 @@ type GameSettingsState = {
 };
 
 export const useGameSettingsStore = create<GameSettingsState>((set) => ({
-  defaultAppleImage: "/assets/ball.png",
-  appleImage: "/assets/ball.png",
+  defaultAppleImage: "/assets/apple.png",
+  appleImage: "/assets/apple.png",
   appleGenerationPrompt: "",
-  defaultBombImage: "/assets/barrier.png",
-  bombImage: "/assets/barrier.png",
+  defaultBombImage: "/assets/bomb.png",
+  bombImage: "/assets/bomb.png",
   bombGenerationPrompt: "",
-  defaultSnakeBodyImage: "/assets/barrier.png",
-  snakeBodyImage: "/assets/barrier.png",
+  defaultSnakeBodyImage: "/assets/snakebody.png",
+  snakeBodyImage: "/assets/snakebody.png",
   snakeBodyGenerationPrompt: "",
   setAppleImage: (appleImage: string) => set({ appleImage }),
   setAppleGenerationPrompt: (appleGenerationPrompt: string) =>

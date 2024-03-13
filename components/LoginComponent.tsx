@@ -46,8 +46,11 @@ import { useScoreSavedModalStore } from "@/stores/useScoreSavedModalStore";
 import { useGameOverModalStore } from "@/stores/useGameOverModalStore";
 import React from "react";
 import { Connection, PublicKey } from "@solana/web3.js";
-import { useConnect, useSolana } from "@particle-network/auth-core-modal";
-import { UserInfo } from "@particle-network/auth-core";
+import {
+  useConnect,
+  useSolana,
+  useAuthCore,
+} from "@particle-network/auth-core-modal";
 import { AnchorProvider } from "@project-serum/anchor";
 
 const LABELS = {
@@ -103,6 +106,9 @@ export const LoginComponent = () => {
     connect: particleConnect,
     connected: particleConnected,
     disconnect: particleDisconnect,
+    connectionStatus,
+    requestConnectCaptcha,
+    setSocialConnectCallback,
   } = useConnect();
 
   const {
@@ -256,11 +262,13 @@ export const LoginComponent = () => {
         try {
           setPhoneError(false);
           console.log("phone: ", cleanPhone);
-          let userInfo: UserInfo | undefined;
+          // let userInfo: UserInfo | undefined;
 
-          userInfo = await particleConnect({
-            phone: selectedCountryCode + cleanPhone,
-          });
+          // userInfo = await particleConnect({
+          //   phone: selectedCountryCode + cleanPhone,
+          // });
+
+          let userInfo = await particleConnect();
 
           if (!userInfo && userInfo != undefined) {
             throw Error("User unavailable");
@@ -295,8 +303,10 @@ export const LoginComponent = () => {
               });
             });
           setPhone("");
+          toast.success("log in completed!");
         } catch (e) {
           console.log("login error: " + JSON.stringify(e));
+          toast.error("log in failed!");
         } finally {
           setLoginInProgress(false);
         }
@@ -433,36 +443,67 @@ export const LoginComponent = () => {
         onOpen={() => setShowLoginModal(true)}
         onClose={() => setShowLoginModal(false)}
       >
-        <MenuButton
-          as={Button}
-          fontFamily="Montserrat"
-          letterSpacing="1px"
-          fontSize="0.75rem"
-          fontWeight="700"
-          borderColor="white"
-          borderWidth="2px"
-          // borderWidth={
-          //   loggedInStatus || loginInProgress || (connecting && !loggedInStatus)
-          //     ? "2px"
-          //     : "0px"
-          // }
-          borderRadius="0px"
-          h="2rem"
-          color="white"
-          _hover={{
-            backgroundColor: "white",
-            color: "black",
-          }}
-          cursor="pointer"
-        >
-          {loggedInStatus
-            ? `${username.slice(0, 5)}...${username.substring(
-                username.length - 4
-              )}`
-            : loginInProgress
-            ? "LOGGING IN..."
-            : "LOGIN"}
-        </MenuButton>
+        {!loggedInStatus ? (
+          <Button
+            fontFamily="Montserrat"
+            letterSpacing="1px"
+            fontSize="0.75rem"
+            fontWeight="700"
+            borderColor="white"
+            borderWidth="2px"
+            borderRadius="0px"
+            h="2rem"
+            color="white"
+            _hover={{
+              backgroundColor: "white",
+              color: "black",
+            }}
+            cursor="pointer"
+            isDisabled={!loginInProgress ? false : phone.length === 0}
+            onClick={() => handlePhoneLogin()}
+            isLoading={loginInProgress}
+            spinner={
+              <Flex flexDirection="row" align="center">
+                <Spinner color={theme.colors.background} size="sm" />
+              </Flex>
+            }
+            _disabled={{
+              bg: "red",
+              cursor: "default",
+            }}
+          >
+            LOGIN
+          </Button>
+        ) : (
+          <MenuButton
+            as={Button}
+            fontFamily="Montserrat"
+            letterSpacing="1px"
+            fontSize="0.75rem"
+            fontWeight="700"
+            borderColor="white"
+            borderWidth="2px"
+            borderRadius="0px"
+            h="2rem"
+            color="white"
+            _hover={{
+              backgroundColor: "white",
+              color: "black",
+            }}
+            cursor="pointer"
+          >
+            {loggedInStatus
+              ? `${username.slice(0, 5)}...${username.substring(
+                  username.length - 4
+                )}`
+              : loginInProgress ||
+                ((connectionStatus == "connecting" ||
+                  connectionStatus == "loading") &&
+                  !loggedInStatus)
+              ? "LOGGING IN..."
+              : "LOGIN"}
+          </MenuButton>
+        )}
 
         <MenuList
           bg={theme.colors.black}
@@ -475,7 +516,10 @@ export const LoginComponent = () => {
           zIndex={200}
           boxShadow="1px 1px 20px black"
         >
-          {loginInProgress ? (
+          {loginInProgress ||
+          ((connectionStatus == "connecting" ||
+            connectionStatus == "loading") &&
+            !loggedInStatus) ? (
             <Flex
               w="100%"
               flexDirection="column"
@@ -490,7 +534,7 @@ export const LoginComponent = () => {
                 LOGGING IN
               </Text>
             </Flex>
-          ) : loggedInStatus ? (
+          ) : loggedInStatus && connectionStatus == "connected" ? (
             <VStack spacing={4} padding="1rem" align="flex-start">
               <Flex direction="column" align="flex-start" w="100%">
                 <Flex m="0.75rem" align="center">

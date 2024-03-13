@@ -10,40 +10,14 @@ import { Solana } from "@particle-network/chains";
 import {
   AuthCoreContextProvider,
   PromptSettingType,
-  useSolana,
 } from "@particle-network/auth-core-modal";
 
 const NoSSRAuthCoreContextProvider = dynamic(
-  async () =>
-    (await import("@particle-network/auth-core-modal")).AuthCoreContextProvider,
+  () => Promise.resolve(AuthCoreContextProvider),
   { ssr: false }
 );
 
-// Dynamically import to avoid SSR issues
-// const NoSSRAuthCoreContextProvider = dynamic(
-//   () => Promise.resolve(AuthCoreContextProvider),
-//   { ssr: false }
-// );
-
-require("@solana/wallet-adapter-react-ui/styles.css");
-
 export const ParticleProvider = ({ children }: { children: ReactNode }) => {
-  const endpoint = process.env.NEXT_PUBLIC_ENDPOINT;
-
-  const wallets = useMemo(() => {
-    return [];
-  }, []);
-
-  const onError = useCallback((error: WalletError) => {
-    console.error("Wallet error: " + error);
-  }, []);
-
-  // useEffect(() => {
-  //   if (typeof window !== "undefined") {
-  //     window.solana = particleProvider;
-  //   }
-  // }, []);
-
   return (
     <NoSSRAuthCoreContextProvider
       options={{

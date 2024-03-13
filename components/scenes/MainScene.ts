@@ -1,6 +1,9 @@
 import Phaser from "phaser";
 
 export default class MainScene extends Phaser.Scene {
+  private appleImage: string;
+  private bombImage: string;
+  // private snakeBodyImage: string;
   private snake!: Phaser.GameObjects.Group;
   private apple!: Phaser.Physics.Arcade.Sprite;
   private bomb!: Phaser.Physics.Arcade.Sprite;
@@ -17,28 +20,31 @@ export default class MainScene extends Phaser.Scene {
   private snakeMoveEvent!: Phaser.Time.TimerEvent;
   private appleEaten: boolean = false;
 
-  private calculateSwipeDirection() {
-    const dx = this.touchEnd.x - this.touchStart.x;
-    const dy = this.touchEnd.y - this.touchStart.y;
-    const absDx = Math.abs(dx);
-    const absDy = Math.abs(dy);
-
-    if (absDx > absDy) {
-      this.direction.x = dx > 0 ? 1 : -1;
-      this.direction.y = 0;
-    } else {
-      this.direction.x = 0;
-      this.direction.y = dy > 0 ? 1 : -1;
-    }
-  }
-
-  constructor() {
+  constructor(appleImage: string, bombImage: string, snakeBodyImage: string) {
     super("MainScene");
+    this.appleImage = appleImage;
+    this.bombImage = bombImage;
+    // this.snakeBodyImage = snakeBodyImage;
     this.touchStart = new Phaser.Math.Vector2();
     this.touchEnd = new Phaser.Math.Vector2();
     this.direction = new Phaser.Math.Vector2();
     this.score = 0;
   }
+
+  // private calculateSwipeDirection() {
+  //   const dx = this.touchEnd.x - this.touchStart.x;
+  //   const dy = this.touchEnd.y - this.touchStart.y;
+  //   const absDx = Math.abs(dx);
+  //   const absDy = Math.abs(dy);
+
+  //   if (absDx > absDy) {
+  //     this.direction.x = dx > 0 ? 1 : -1;
+  //     this.direction.y = 0;
+  //   } else {
+  //     this.direction.x = 0;
+  //     this.direction.y = dy > 0 ? 1 : -1;
+  //   }
+  // }
 
   resetValues() {
     this.snake = this.add.group();
@@ -48,8 +54,11 @@ export default class MainScene extends Phaser.Scene {
   }
 
   preload() {
-    this.load.image("apple", "../assets/apple.png");
-    this.load.image("bomb", "../assets/bomb.png");
+    this.load.image("apple", this.appleImage);
+    this.load.image("bomb", this.bombImage);
+    // this.load.image("body", this.snakeBodyImage);
+    // this.load.image("apple", "../assets/apple.png");
+    // this.load.image("bomb", "../assets/bomb.png");
     this.load.image("body", "../assets/snakebody.png");
     this.load.image("pause", "../assets/pause.svg");
     this.load.image("play", "../assets/play.svg");
@@ -62,14 +71,14 @@ export default class MainScene extends Phaser.Scene {
 
     this.cursors = this.input.keyboard!.createCursorKeys();
 
-    this.input.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
-      this.touchStart.set(pointer.x, pointer.y);
-    });
+    // this.input.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
+    //   this.touchStart.set(pointer.x, pointer.y);
+    // });
 
-    this.input.on("pointerup", (pointer: Phaser.Input.Pointer) => {
-      this.touchEnd.set(pointer.x, pointer.y);
-      this.calculateSwipeDirection();
-    });
+    // this.input.on("pointerup", (pointer: Phaser.Input.Pointer) => {
+    //   this.touchEnd.set(pointer.x, pointer.y);
+    //   this.calculateSwipeDirection();
+    // });
 
     this.createSnake();
     this.createApple();

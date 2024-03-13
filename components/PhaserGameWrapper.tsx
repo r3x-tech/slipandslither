@@ -12,7 +12,7 @@ import {
   Spinner,
   Text,
   Box,
-} from "@chakra-ui/react"; // Import Spinner
+} from "@chakra-ui/react";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { saveHighScore } from "../utils/supabase";
 import { useScoreStore } from "../stores/useScoreStore";
@@ -21,7 +21,6 @@ import { useLoginModalStore } from "@/stores/useLoginModalStore";
 import userStore from "@/stores/userStore";
 import { useScoreSavedModalStore } from "@/stores/useScoreSavedModalStore";
 import toast from "react-hot-toast";
-import PhaserGameComponent from "./PhaserGameComponent";
 
 const PhaserGame = dynamic(() => import("./PhaserGameComponent"), {
   ssr: false,
@@ -37,7 +36,7 @@ export default function PhaserGameWrapper() {
   const score = useScoreStore((state) => state.score);
   const { showScoreSavedModal, setShowScoreSavedModal } =
     useScoreSavedModalStore();
-  const phaserCanvas = document.querySelector("#phaser-game canvas");
+  // const phaserCanvas = document.querySelector("#phaser-game canvas");
 
   const saveHighscore = async () => {
     useLoadingStore.getState().setLoadingStatus(true);
