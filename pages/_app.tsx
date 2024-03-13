@@ -7,21 +7,23 @@ import { Toaster } from "react-hot-toast";
 import Router from "next/router";
 import withGA from "next-ga";
 import { Analytics } from "@vercel/analytics/react";
-import { ParticleProvider } from "@particle-network/provider";
+import { ParticleProvider } from "@/contexts/ParticleProvider";
 
 const queryClient = new QueryClient();
 
 function App({ Component, pageProps }: AppProps) {
   return (
-    <ParticleProvider>
-      <ChakraProvider theme={theme}>
-        <QueryClientProvider client={queryClient}>
-          <Component {...pageProps} />
-          <Analytics />
-          <Toaster />
-        </QueryClientProvider>
-      </ChakraProvider>
-    </ParticleProvider>
+    <>
+      <ParticleProvider>
+        <ChakraProvider theme={theme}>
+          <QueryClientProvider client={queryClient}>
+            <Component {...pageProps} />
+            <Analytics />
+            <Toaster />
+          </QueryClientProvider>
+        </ChakraProvider>
+      </ParticleProvider>
+    </>
   );
 }
 

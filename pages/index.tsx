@@ -1,15 +1,4 @@
 import React, { FC, useMemo, useState } from "react";
-import {
-  ConnectionProvider,
-  WalletProvider,
-} from "@solana/wallet-adapter-react";
-import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
-import {
-  PhantomWalletAdapter,
-  UnsafeBurnerWalletAdapter,
-} from "@solana/wallet-adapter-wallets";
-import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
-import { clusterApiUrl } from "@solana/web3.js";
 import { Box, Button, Flex } from "@chakra-ui/react";
 import Header from "../components/Header";
 import PhaserGameWrapper from "../components/PhaserGameWrapper";

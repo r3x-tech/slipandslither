@@ -27,7 +27,7 @@ const NoSSRAuthCoreContextProvider = dynamic(
 
 require("@solana/wallet-adapter-react-ui/styles.css");
 
-export const ParticleProvider: FC<{ children: ReactNode }> = ({ children }) => {
+export const ParticleProvider = ({ children }: { children: ReactNode }) => {
   const endpoint = process.env.NEXT_PUBLIC_ENDPOINT;
 
   const wallets = useMemo(() => {
@@ -47,9 +47,9 @@ export const ParticleProvider: FC<{ children: ReactNode }> = ({ children }) => {
   return (
     <NoSSRAuthCoreContextProvider
       options={{
-        projectId: process.env.NEXT_PUBLIC_PROJECT_ID!,
-        clientKey: process.env.NEXT_PUBLIC_CLIENT_KEY!,
-        appId: process.env.NEXT_PUBLIC_APP_ID!,
+        projectId: process.env.NEXT_PUBLIC_PARTICLE_PROJECT_ID!,
+        clientKey: process.env.NEXT_PUBLIC_PARTICLE_CLIENT_KEY!,
+        appId: process.env.NEXT_PUBLIC_PARTICLE_APP_ID!,
         authTypes: [AuthType.phone],
         themeType: "dark",
         fiatCoin: "USD",

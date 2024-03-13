@@ -45,10 +45,9 @@ import { useScoreStore } from "@/stores/useScoreStore";
 import { useScoreSavedModalStore } from "@/stores/useScoreSavedModalStore";
 import { useGameOverModalStore } from "@/stores/useGameOverModalStore";
 import React from "react";
-import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { Connection, PublicKey } from "@solana/web3.js";
-import { useParticle } from "../contexts/ParticleContextProvider";
-import { UserInfo } from "@particle-network/auth";
+import { useConnect, useSolana } from "@particle-network/auth-core-modal";
+import { UserInfo } from "@particle-network/auth-core";
 
 const LABELS = {
   "change-wallet": "CHANGE WALLET",
@@ -88,7 +87,22 @@ export const LoginComponent = () => {
     useScoreSavedModalStore();
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const { setVisible: setModalVisible } = useWalletModal();
+  const {
+    address,
+    chainId,
+    chainInfo,
+    switchChain,
+    signMessage,
+    signTransaction,
+    signAllTransactions,
+    signAndSendTransaction,
+    enable,
+  } = useSolana();
+  const {
+    connect: particleConnect,
+    connected: particleConnected,
+    disconnect: particleDisconnect,
+  } = useConnect();
 
   const {
     username,
@@ -196,40 +210,38 @@ export const LoginComponent = () => {
     solana_wallet_address,
   ]);
 
-  const context = useParticle();
+  // const context = useParticle();
 
-  if (!context) {
-    // Handle the case where context is not available
-    return (
-      <Flex
-        justifyContent="center"
-        alignItems="center"
-        h="100vh"
-        w="100vw"
-        bg={theme.colors.background}
-      >
-        <Flex
-          w="100%"
-          flexDirection="column"
-          align="center"
-          justifyContent="center"
-          color={theme.colors.red}
-          my="4.58rem"
-        >
-          <Spinner size="sm" />
-          <Text mt={3} fontSize="0.75rem" fontWeight="500">
-            Loading...
-          </Text>
-        </Flex>
-      </Flex>
-    );
-  }
-  const { particle, particleProvider, solanaWallet } = context;
+  // if (!context) {
+  //   // Handle the case where context is not available
+  //   return (
+  //     <Flex
+  //       justifyContent="center"
+  //       alignItems="center"
+  //       h="100vh"
+  //       w="100vw"
+  //       bg={theme.colors.background}
+  //     >
+  //       <Flex
+  //         w="100%"
+  //         flexDirection="column"
+  //         align="center"
+  //         justifyContent="center"
+  //         color={theme.colors.red}
+  //         my="4.58rem"
+  //       >
+  //         <Spinner size="sm" />
+  //         <Text mt={3} fontSize="0.75rem" fontWeight="500">
+  //           Loading...
+  //         </Text>
+  //       </Flex>
+  //     </Flex>
+  //   );
+  // }
+  // const { particle, particleProvider, solanaWallet } = context;
 
   const handlePhoneLogin = async () => {
     setLoginInProgress(true);
-
-    // Remove any dashes from the phone input
     const cleanPhone = phone.replace(/-/g, "");
 
     if (!loggedIn) {
@@ -243,69 +255,45 @@ export const LoginComponent = () => {
         try {
           setPhoneError(false);
           console.log("phone: ", cleanPhone);
-          if (particle && solanaWallet) {
-            // const rpcUrl = process.env.NEXT_PUBLIC_ENDPOINT;
-            let userInfo: UserInfo | null;
+          let userInfo: UserInfo | undefined;
 
-            if (!particle) {
-              throw Error("Particle unavailable");
-            }
+          userInfo = await particleConnect({
+            phone: selectedCountryCode + cleanPhone,
+          });
 
-            if (!particle.auth.isLogin()) {
-              // Request user login if needed, returns current user info
-              userInfo = await particle.auth.login({
-                preferredAuthType: "phone",
-                account: selectedCountryCode + cleanPhone, //phone number must use E.164
-              });
-            } else {
-              userInfo = particle.auth.getUserInfo();
-            }
-
-            const currentUserInfo = userInfo;
-            if (!currentUserInfo) {
-              throw Error("User unavailable");
-            }
-
-            if (!solanaWallet) {
-              throw Error("Wallet unavailable");
-            }
-
-            if (!solanaWallet.signTransaction) {
-              throw Error("Signing unavailable 0x1");
-            }
-
-            if (!solanaWallet.signAllTransactions) {
-              throw Error("Signing unavailable 0x2");
-            }
-
-            console.log("phone: ", currentUserInfo.phone);
-
-            fetch("https://api.ipify.org?format=json")
-              .then((response) => response.json())
-              .then((data) => {
-                userStore.setState({
-                  loggedIn: true,
-                  loginType: "PHONE",
-                  username: currentUserInfo.phone || "",
-                  solana_wallet_address:
-                    solanaWallet.publicKey?.toBase58() || "",
-                  currentConnection: particle.solana.getRpcUrl()
-                    ? new Connection(particle.solana.getRpcUrl())
-                    : null,
-                  currentWallet: {
-                    publicKey: new PublicKey(
-                      solanaWallet!.publicKey!.toBase58()
-                    ),
-                    signTransaction: solanaWallet.signTransaction,
-                    signAllTransactions: solanaWallet.signAllTransactions,
-                  },
-                  ip_address: data.ip,
-                });
-              });
-            setPhone("");
-          } else {
-            console.log("no account");
+          if (!userInfo && userInfo != undefined) {
+            throw Error("User unavailable");
           }
+
+          if (!address) {
+            throw Error("Address unavailable");
+          }
+
+          if (!signTransaction) {
+            throw Error("Signing unavailable 0x1");
+          }
+
+          if (!signAllTransactions) {
+            throw Error("Signing unavailable 0x2");
+          }
+
+          fetch("https://api.ipify.org?format=json")
+            .then((response) => response.json())
+            .then((data) => {
+              userStore.setState({
+                loggedIn: true,
+                loginType: "PHONE",
+                username: userInfo!.phone || "",
+                solana_wallet_address: address,
+                currentWallet: {
+                  publicKey: new PublicKey(address),
+                  signTransaction: signTransaction,
+                  signAllTransactions: signAllTransactions,
+                },
+                ip_address: data.ip,
+              });
+            });
+          setPhone("");
         } catch (e) {
           console.log("login error: " + JSON.stringify(e));
         } finally {
@@ -315,16 +303,101 @@ export const LoginComponent = () => {
     }
   };
 
+  // const handlePhoneLogin = async () => {
+  //   setLoginInProgress(true);
+
+  //   // Remove any dashes from the phone input
+  //   const cleanPhone = phone.replace(/-/g, "");
+
+  //   if (!loggedIn) {
+  //     if (!(selectedCountryCode + cleanPhone).match(/^\+\d{1,14}$/)) {
+  //       console.log("phone error");
+  //       console.log("phone: ", cleanPhone);
+  //       console.log("phone number: ", selectedCountryCode + cleanPhone);
+
+  //       setPhoneError(true);
+  //     } else {
+  //       try {
+  //         setPhoneError(false);
+  //         console.log("phone: ", cleanPhone);
+  //         if (particle && solanaWallet) {
+  //           // const rpcUrl = process.env.NEXT_PUBLIC_ENDPOINT;
+  //           let userInfo: UserInfo | null;
+
+  //           if (!particle) {
+  //             throw Error("Particle unavailable");
+  //           }
+
+  //           if (!particle.auth.isLogin()) {
+  //             // Request user login if needed, returns current user info
+  //             userInfo = await particle.auth.login({
+  //               preferredAuthType: "phone",
+  //               account: selectedCountryCode + cleanPhone, //phone number must use E.164
+  //             });
+  //           } else {
+  //             userInfo = particle.auth.getUserInfo();
+  //           }
+
+  //           const currentUserInfo = userInfo;
+  //           if (!currentUserInfo) {
+  //             throw Error("User unavailable");
+  //           }
+
+  //           if (!solanaWallet) {
+  //             throw Error("Wallet unavailable");
+  //           }
+
+  //           if (!solanaWallet.signTransaction) {
+  //             throw Error("Signing unavailable 0x1");
+  //           }
+
+  //           if (!solanaWallet.signAllTransactions) {
+  //             throw Error("Signing unavailable 0x2");
+  //           }
+
+  //           console.log("phone: ", currentUserInfo.phone);
+
+  //           fetch("https://api.ipify.org?format=json")
+  //             .then((response) => response.json())
+  //             .then((data) => {
+  //               userStore.setState({
+  //                 loggedIn: true,
+  //                 loginType: "PHONE",
+  //                 username: currentUserInfo.phone || "",
+  //                 solana_wallet_address:
+  //                   solanaWallet.publicKey?.toBase58() || "",
+  //                 currentConnection: particle.solana.getRpcUrl()
+  //                   ? new Connection(particle.solana.getRpcUrl())
+  //                   : null,
+  //                 currentWallet: {
+  //                   publicKey: new PublicKey(
+  //                     solanaWallet!.publicKey!.toBase58()
+  //                   ),
+  //                   signTransaction: solanaWallet.signTransaction,
+  //                   signAllTransactions: solanaWallet.signAllTransactions,
+  //                 },
+  //                 ip_address: data.ip,
+  //               });
+  //             });
+  //           setPhone("");
+  //         } else {
+  //           console.log("no account");
+  //         }
+  //       } catch (e) {
+  //         console.log("login error: " + JSON.stringify(e));
+  //       } finally {
+  //         setLoginInProgress(false);
+  //       }
+  //     }
+  //   }
+  // };
+
   const handleLogout = async () => {
     try {
       setLogoutStatus(true);
 
-      console.log("particle.auth.isLogin(): ", particle!.auth.isLogin());
-      console.log("particle: ", particle!);
-      console.log("loggedIn: ", loggedIn!);
-
-      if (particle && particle.auth.isLogin()) {
-        particle.auth.logout().then(() => {
+      if (particleConnected && loggedIn) {
+        await particleDisconnect().then(() => {
           console.log("logout");
         });
         userStore.setState({
@@ -385,7 +458,7 @@ export const LoginComponent = () => {
             ? `${username.slice(0, 5)}...${username.substring(
                 username.length - 4
               )}`
-            : loginInProgress || (connecting && !loggedInStatus)
+            : loginInProgress
             ? "LOGGING IN..."
             : "LOGIN"}
         </MenuButton>
@@ -401,7 +474,7 @@ export const LoginComponent = () => {
           zIndex={200}
           boxShadow="1px 1px 20px black"
         >
-          {loginInProgress || (connecting && !loggedInStatus) ? (
+          {loginInProgress ? (
             <Flex
               w="100%"
               flexDirection="column"
@@ -657,122 +730,6 @@ export const LoginComponent = () => {
                 >
                   LOGIN W/ PHONE
                 </Button>
-              </Flex>
-              <Flex w="100%" justifyContent="center" my="0" py="0">
-                <Text
-                  fontWeight="500"
-                  fontSize="0.75rem"
-                  color={theme.colors.white}
-                  py="0"
-                  my="0"
-                >
-                  OR{" "}
-                </Text>
-              </Flex>
-              <Flex
-                flexDirection={["column", "column"]}
-                justifyContent="center"
-                w="100%"
-                mt="0rem"
-                gap={3}
-              >
-                {/* <Button
-                  leftIcon={
-                    <Image
-                      src="/googleLogo.webp"
-                      alt="Google Logo"
-                      boxSize="1rem"
-                      mr="0.25rem"
-                    />
-                  }
-                  variant="outline"
-                  borderColor={theme.colors.white}
-                  border="2px solid white"
-                  borderRadius="0px"
-                  color={theme.colors.white}
-                  width="100%"
-                  fontSize="0.75rem"
-                  fontWeight="700"
-                  _hover={{
-                    color: theme.colors.black,
-                    backgroundColor: theme.colors.white,
-                    borderColor: theme.colors.white,
-                  }}
-                  isDisabled={loginInProgress}
-                  onClick={() => handleGoogleLogin()}
-                  isLoading={loginInProgress}
-                  spinner={
-                    <Flex flexDirection="row" align="center">
-                      <Spinner color={theme.colors.background} size="sm" />
-                    </Flex>
-                  }
-                  _disabled={{
-                    bg: "#fffff",
-                    cursor: "default",
-                    borderColor: "#666666",
-                  }}
-                >
-                  LOGIN W/ GOOGLE
-                </Button> */}
-
-                <Button
-                  leftIcon={
-                    <Image
-                      src="/solLogo.svg" // Path to Solana logo
-                      alt="Solana Logo"
-                      boxSize="1rem"
-                      mr="0.25rem"
-                    />
-                  }
-                  variant="outline"
-                  borderColor="white"
-                  borderWidth="2px"
-                  borderRadius="0px"
-                  color="white"
-                  width="100%"
-                  fontSize="0.75rem"
-                  fontWeight="700"
-                  _hover={{
-                    color: "black",
-                    backgroundColor: "white",
-                    borderColor: "white",
-                  }}
-                  isDisabled={loginInProgress}
-                  onClick={() => {
-                    if (!loggedInStatus && !loginInProgress && !connecting) {
-                      handleSolanaLogin();
-                    }
-                  }}
-                  isLoading={loginInProgress}
-                  spinner={
-                    <Flex flexDirection="row" align="center">
-                      <Spinner color="background" size="sm" />
-                    </Flex>
-                  }
-                  _disabled={{
-                    bg: "white",
-                    cursor: "default",
-                    borderColor: "#666666",
-                  }}
-                >
-                  LOGIN W/ SOLANA
-                </Button>
-
-                {/* <BaseWalletMultiButton
-                  startIcon={
-                    <Image
-                      src="/solLogo.svg"
-                      alt="Solana Logo"
-                      style={{
-                        width: "1rem",
-                        height: "1rem",
-                        marginLeft: "0.75rem",
-                        marginRight: "0.75rem",
-                      }}
-                    />
-                  }
-                  labels={LABELS}
-                /> */}
               </Flex>
             </Stack>
           )}
