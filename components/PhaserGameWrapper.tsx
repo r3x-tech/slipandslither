@@ -95,37 +95,9 @@ export default function PhaserGameWrapper() {
     }
   }, [walletAddress, score, loadingStatus, setShowScoreSavedModal]);
 
-  // const stopPropagation = (e: React.MouseEvent) => {
-  //   e.stopPropagation();
-  // };
-
-  // useEffect(() => {
-  //   const handleDocumentClick = (event: any) => {
-  //     const handleDocumentClick = (event: any) => {
-  //       const phaserCanvas = document.querySelector(
-  //         "#phaser-game canvas"
-  //       ) as HTMLElement;
-  //       if (phaserCanvas && !phaserCanvas.contains(event.target as Node)) {
-  //         // Now that phaserCanvas is typed as HTMLElement, you can call blur on it
-  //         if (document.activeElement === phaserCanvas) {
-  //           phaserCanvas.blur();
-  //         }
-  //         // Or, to focus another element:
-  //         // document.getElementById('some-other-element').focus();
-  //       }
-  //     };
-
-  //     // Add event listener for clicks
-  //     document.addEventListener("click", handleDocumentClick);
-
-  //     // Optionally, handle keydown or other events similarly
-
-  //     // Cleanup event listener on component unmount
-  //     return () => {
-  //       document.removeEventListener("click", handleDocumentClick);
-  //     };
-  //   };
-  // }, []);
+  const stopPropagation = (e: React.MouseEvent) => {
+    e.stopPropagation();
+  };
 
   return (
     <Flex
@@ -155,7 +127,7 @@ export default function PhaserGameWrapper() {
           py="10px"
           w="362px"
           h="362px"
-          // onClick={stopPropagation}
+          onClick={stopPropagation}
         >
           <ModalFooter>
             <VStack spacing="25px" width="360px">

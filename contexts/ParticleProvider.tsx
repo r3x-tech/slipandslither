@@ -7,13 +7,16 @@ import { FC, ReactNode, useCallback, useEffect, useMemo } from "react";
 import dynamic from "next/dynamic";
 import { AuthType } from "@particle-network/auth-core";
 import { Solana } from "@particle-network/chains";
-import {
-  AuthCoreContextProvider,
-  PromptSettingType,
-} from "@particle-network/auth-core-modal";
+import { PromptSettingType } from "@particle-network/auth-core-modal";
+
+// const NoSSRAuthCoreContextProvider = dynamic(
+//   () => Promise.resolve(AuthCoreContextProvider),
+//   { ssr: false }
+// );
 
 const NoSSRAuthCoreContextProvider = dynamic(
-  () => Promise.resolve(AuthCoreContextProvider),
+  async () =>
+    (await import("@particle-network/auth-core-modal")).AuthCoreContextProvider,
   { ssr: false }
 );
 
@@ -28,10 +31,10 @@ export const ParticleProvider = ({ children }: { children: ReactNode }) => {
         themeType: "dark",
         fiatCoin: "USD",
         language: "en",
-        promptSettingConfig: {
-          promptPaymentPasswordSettingWhenSign: PromptSettingType.first,
-          promptMasterPasswordSettingWhenLogin: PromptSettingType.first,
-        },
+        // promptSettingConfig: {
+        //   promptPaymentPasswordSettingWhenSign: PromptSettingType.first,
+        //   promptMasterPasswordSettingWhenLogin: PromptSettingType.first,
+        // },
         wallet: {
           visible: false,
           customStyle: {

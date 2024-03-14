@@ -473,8 +473,9 @@ export const LoginComponent = () => {
               </Flex>
             }
             _disabled={{
-              bg: "red",
+              bg: "gray",
               cursor: "default",
+              borderColor: "grey",
             }}
           >
             LOGIN

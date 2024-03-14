@@ -31,6 +31,7 @@ const Header = ({
     alignItems="flex-end"
     minHeight="40px"
     mt="0rem"
+    mb="10rem"
   >
     <Flex
       justifyContent="space-between"
@@ -38,9 +39,9 @@ const Header = ({
       maxWidth="360px"
       width="100%"
     >
-      <Flex flex="2" justifyContent="flex-start">
+      {/* <Flex flex="2" justifyContent="flex-start">
         <LoginComponent />
-      </Flex>
+      </Flex> */}
       <Flex flex="1" justifyContent="center">
         <Popover placement="bottom-end">
           <PopoverTrigger>
