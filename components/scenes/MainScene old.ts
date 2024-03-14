@@ -1,6 +1,6 @@
 import Phaser from "phaser";
 
-export default class MainScene extends Phaser.Scene {
+export default class OldMainScene extends Phaser.Scene {
   private ballImage: string;
   private barrierImage: string;
   private ball!: Phaser.Physics.Arcade.Sprite;

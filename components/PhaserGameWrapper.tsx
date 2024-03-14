@@ -22,7 +22,11 @@ import userStore from "@/stores/userStore";
 import { useScoreSavedModalStore } from "@/stores/useScoreSavedModalStore";
 import toast from "react-hot-toast";
 
-const PhaserGame = dynamic(() => import("./PhaserGameComponent"), {
+// const PhaserGame = dynamic(() => import("./PhaserGameComponent"), {
+//   ssr: false,
+// });
+
+const SimplePhaserGame = dynamic(() => import("./SimplePhaserGameComponent"), {
   ssr: false,
 });
 
@@ -189,7 +193,8 @@ export default function PhaserGameWrapper() {
           </ModalFooter>
         </ModalContent>
       </Modal>
-      <PhaserGame />
+      {/* <PhaserGame /> */}
+      <SimplePhaserGame />
     </Flex>
   );
 }
