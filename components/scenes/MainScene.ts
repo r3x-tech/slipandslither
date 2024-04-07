@@ -7,6 +7,7 @@ export default class MainScene extends Phaser.Scene {
   private snake!: Phaser.GameObjects.Group;
   private apple!: Phaser.Physics.Arcade.Sprite;
   private bomb!: Phaser.Physics.Arcade.Sprite;
+  private ora!: Phaser.Physics.Arcade.Sprite;
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
   private score: number = 0;
   private scoreText!: Phaser.GameObjects.Text;
@@ -19,6 +20,7 @@ export default class MainScene extends Phaser.Scene {
   private isMobile!: boolean;
   private snakeMoveEvent!: Phaser.Time.TimerEvent;
   private appleEaten: boolean = false;
+  private oraEaten: boolean = false;
 
   constructor(appleImage: string, bombImage: string, snakeBodyImage: string) {
     super("MainScene");
@@ -60,6 +62,7 @@ export default class MainScene extends Phaser.Scene {
     // this.load.image("apple", "../assets/apple.png");
     // this.load.image("bomb", "../assets/bomb.png");
     this.load.image("body", "../assets/snakebody.png");
+    this.load.image("ora", "../assets/oralogo.png");
     this.load.image("pause", "../assets/pause.svg");
     this.load.image("play", "../assets/play.svg");
   }
@@ -83,6 +86,7 @@ export default class MainScene extends Phaser.Scene {
     this.createSnake();
     this.createApple();
     this.createBomb();
+    this.createOra();
     this.scoreText = this.add.text(16, 16, "SCORE: 0", {
       fontSize: "16px",
       color: "#fff",
@@ -120,6 +124,19 @@ export default class MainScene extends Phaser.Scene {
           bomb instanceof Phaser.Physics.Arcade.Sprite
         ) {
           this.hitBomb(player, bomb);
+        }
+      }
+    );
+
+    this.physics.add.collider(
+      this.snake.getChildren()[0],
+      this.ora,
+      (player, ora) => {
+        if (
+          player instanceof Phaser.Physics.Arcade.Sprite &&
+          ora instanceof Phaser.Physics.Arcade.Sprite
+        ) {
+          this.eatOra(player, ora);
         }
       }
     );
@@ -168,6 +185,39 @@ export default class MainScene extends Phaser.Scene {
   update() {
     if (this.paused || this.gameOver) return;
     this.handleKeyboardControls();
+  }
+
+  createOra() {
+    let newOraPosition: Phaser.Math.Vector2;
+    do {
+      const oraX = Phaser.Math.Between(
+        20,
+        Number(this.sys.game.config.width) - 20
+      );
+      const oraY = Phaser.Math.Between(
+        60,
+        Number(this.sys.game.config.height) - 20
+      );
+      newOraPosition = new Phaser.Math.Vector2(oraX, oraY);
+    } while (this.isPositionInvalid(newOraPosition)); // You may need to implement this method to check position validity
+
+    this.ora = this.physics.add
+      .sprite(newOraPosition.x, newOraPosition.y, "ora")
+      .setOrigin(0);
+    this.ora.setDisplaySize(20, 20);
+    if (this.ora.body) {
+      this.ora.body.setSize(350, 350);
+    }
+  }
+
+  eatOra(
+    player: Phaser.Physics.Arcade.Sprite,
+    ora: Phaser.Physics.Arcade.Sprite
+  ) {
+    this.oraEaten = true; // Set oraEaten flag to true
+    ora.destroy(); // Remove ora from the scene
+    // Trigger the winning condition
+    this.scene.start("WinningScreen", { score: this.score }); // Assuming you have a WinningScreen scene
   }
 
   togglePause() {
