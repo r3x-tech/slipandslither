@@ -1,0 +1,43 @@
+{
+    "name": "OraHacks 2024 Participant NFT",
+    "symbol": "ORH24P",
+    "description": "A generative NFT by ClickCrate for participation in the OraHacks 2024 hackathon",
+    "seller_fee_basis_points": 10000,
+    "image": "https://purple-given-piranha-953.mypinata.cloud/ipfs/Qmb2nUR1taaMU4ZH7RATR9mWahcJTW65ZpEZ5GCLxGYXq7",
+    "animation_url": "",
+    "external_url": "https://orahacks.com/",
+    "creator_url": "https://www.r3x.tech/",
+    "attributes": [
+        {
+            "trait_type": "Type",
+            "value": "Participant"
+        },
+        {
+            "trait_type": "Location",
+            "value": "Chicao, IL"
+        },
+        {
+            "trait_type": "Game",
+            "value": "Slip & Slither"
+        },
+        {
+            "trait_type": "Associated Service",
+            "value": "ClickCrate"
+        }
+    ],
+    "properties": {
+        "files": [
+            {
+                "uri": "https://purple-given-piranha-953.mypinata.cloud/ipfs/Qmb2nUR1taaMU4ZH7RATR9mWahcJTW65ZpEZ5GCLxGYXq7",
+                "type": "image/svg"
+            }
+        ],
+        "category": "image",
+        "creators": [
+            {
+                "address": "EwdCuwFMNoHWi2BT8UrmdjjfUanUp7kAvUVvUa9x3Ws4",
+                "share": 100
+            }
+        ]
+    }
+}

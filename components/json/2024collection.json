@@ -1,0 +1,31 @@
+{
+    "name": "OraHacks 2024 Collection",
+    "symbol": "ORH24C",
+    "description": "A collection of NFTs by ClickCrate for the OraHacks 2024 hackathon",
+    "seller_fee_basis_points": 10000,
+    "image": "https://purple-given-piranha-953.mypinata.cloud/ipfs/QmRgk5AUMf39vjTwNs7Y4AtMYGf25LTFNYP5Tk3TuRv7iv",
+    "animation_url": "",
+    "external_url": "https://orahacks.com/",
+    "creator_url": "https://www.r3x.tech/",
+    "attributes": [
+        {
+            "trait_type": "Type",
+            "value": "Parent"
+        }
+    ],
+    "properties": {
+        "files": [
+            {
+                "uri": "https://purple-given-piranha-953.mypinata.cloud/ipfs/QmRgk5AUMf39vjTwNs7Y4AtMYGf25LTFNYP5Tk3TuRv7iv",
+                "type": "image/svg"
+            }
+        ],
+        "category": "image",
+        "creators": [
+            {
+                "address": "EwdCuwFMNoHWi2BT8UrmdjjfUanUp7kAvUVvUa9x3Ws4",
+                "share": 1
+            }
+        ]
+    }
+}
