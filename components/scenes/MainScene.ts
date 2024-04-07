@@ -437,6 +437,51 @@ export default class MainScene extends Phaser.Scene {
     this.snake.add(newSegment);
   }
 
+  private isPositionInvalid(newPosition: Phaser.Math.Vector2): boolean {
+    // Check if the new position collides with any part of the snake
+    const positionOnSnake = this.snake.getChildren().some((segment) => {
+      const seg = segment as Phaser.Physics.Arcade.Sprite;
+      return newPosition.x === seg.x && newPosition.y === seg.y;
+    });
+
+    // Check if the new position is too close to the apple
+    const positionOnApple =
+      this.apple &&
+      Phaser.Math.Distance.Between(
+        newPosition.x,
+        newPosition.y,
+        this.apple.x,
+        this.apple.y
+      ) < 20;
+
+    // Check if the new position is too close to the bomb
+    const positionOnBomb =
+      this.bomb &&
+      Phaser.Math.Distance.Between(
+        newPosition.x,
+        newPosition.y,
+        this.bomb.x,
+        this.bomb.y
+      ) < 20;
+
+    // Check if the new position is too close to the ora, if ora exists
+    let positionOnOra = false;
+    if (this.ora) {
+      positionOnOra =
+        Phaser.Math.Distance.Between(
+          newPosition.x,
+          newPosition.y,
+          this.ora.x,
+          this.ora.y
+        ) < 20;
+    }
+
+    // If the new position is on the snake, apple, bomb, or ora, it is invalid
+    return (
+      positionOnSnake || positionOnApple || positionOnBomb || positionOnOra
+    );
+  }
+
   endGame() {
     this.gameOver = true;
     this.physics.pause();
