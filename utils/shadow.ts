@@ -1,6 +1,5 @@
 const anchor = require("@project-serum/anchor");
 import { OwnedStorageAccount, StorageAccountResponse } from "@/types/types";
-import { apiRequest } from "./index";
 import {
   ShdwDrive,
   ShadowUploadResponse,
