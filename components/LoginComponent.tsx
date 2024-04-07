@@ -46,12 +46,9 @@ import { useScoreSavedModalStore } from "@/stores/useScoreSavedModalStore";
 import { useGameOverModalStore } from "@/stores/useGameOverModalStore";
 import React from "react";
 import { Connection, PublicKey } from "@solana/web3.js";
-import {
-  useConnect,
-  useSolana,
-  useAuthCore,
-} from "@particle-network/auth-core-modal";
-import { AnchorProvider } from "@project-serum/anchor";
+import { useConnect, useSolana } from "@particle-network/auth-core-modal";
+import { UserInfo } from "@particle-network/auth-core";
+import { getUSDCBalance } from "@/utils/shyft";
 
 const LABELS = {
   "change-wallet": "CHANGE WALLET",
@@ -90,6 +87,9 @@ export const LoginComponent = () => {
   const { showScoreSavedModal, setShowScoreSavedModal } =
     useScoreSavedModalStore();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [currentUsdcBalance, setCurrentUsdcBalance] = useState<string | null>(
+    null
+  );
 
   const {
     address,
@@ -117,6 +117,8 @@ export const LoginComponent = () => {
     loginType,
     solana_wallet_address,
     currentConnection,
+    currentUserInfo,
+    currentWallet,
     ip_address,
     userProfilePic,
   } = userStore();
@@ -217,6 +219,21 @@ export const LoginComponent = () => {
     solana_wallet_address,
   ]);
 
+  useEffect(() => {
+    const fetchUSDCBalance = async () => {
+      if (solana_wallet_address) {
+        const balanceData = await getUSDCBalance(solana_wallet_address);
+        if (balanceData && balanceData.success) {
+          setCurrentUsdcBalance(balanceData.result.balance.toFixed(2));
+        } else {
+          setCurrentUsdcBalance("N/A");
+        }
+      }
+    };
+
+    fetchUSDCBalance();
+  }, [solana_wallet_address]);
+
   // const context = useParticle();
 
   // if (!context) {
@@ -305,6 +322,7 @@ export const LoginComponent = () => {
                 signTransaction: signTransaction,
                 signAllTransactions: signAllTransactions,
               },
+              currentUserInfo: userInfo,
               ip_address: data.ip,
             });
           });
@@ -592,7 +610,7 @@ export const LoginComponent = () => {
                   </Tooltip>
                 </Flex>
 
-                {/* <Flex w="100%" h="100%" justifyContent="start" align="center">
+                <Flex w="100%" h="100%" justifyContent="start" align="center">
                   <Flex
                     w="12.5rem"
                     h="2.25rem"
@@ -612,11 +630,11 @@ export const LoginComponent = () => {
                       fontWeight="700"
                       color={theme.colors.green}
                     >
-                      ${`222`}.00 USD
+                      ${currentUsdcBalance ? currentUsdcBalance : "N/A"} USDC
                     </Text>
                   </Flex>
 
-                  <Button
+                  {/* <Button
                     fontSize="0.75rem"
                     fontWeight="700"
                     as="a"
@@ -634,8 +652,8 @@ export const LoginComponent = () => {
                     }}
                   >
                     BUY MORE +
-                  </Button>
-                </Flex> */}
+                  </Button> */}
+                </Flex>
                 <Flex w="100%">
                   <Button
                     fontSize="0.9rem"
