@@ -1,13 +1,6 @@
 // import { generateSigner, percentAmount } from "@metaplex-foundation/umi";
 // import { createNft } from "@metaplex-foundation/mpl-token-metadata";
-import {
-  NFT,
-  NFTResponse,
-  ServiceCharge,
-  TxResponse,
-  WalletNFTResponse,
-} from "@/types/types";
-import { apiRequest } from ".";
+import { NFT, ServiceCharge, TxResponse } from "@/types/types";
 import axios from "axios";
 import { Connection, Transaction, VersionedTransaction } from "@solana/web3.js";
 

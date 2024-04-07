@@ -129,7 +129,7 @@ export function Customize() {
   };
 
   const handleGenerateBombImage = async (data: FormData) => {
-    console.log("ran handleGeneratebombImage");
+    console.log("ran handleGenerateBombImage");
     const prompt = data.aiBombImageInput;
 
     // Validate prompt
@@ -216,7 +216,7 @@ export function Customize() {
           >
             <Tabs variant="soft-rounded" colorScheme="current">
               <TabList pt="0rem">
-                <Tab
+                {/* <Tab
                   flex={1}
                   borderColor="black"
                   borderWidth="2px"
@@ -232,7 +232,7 @@ export function Customize() {
                   h="2rem"
                 >
                   SNAKE
-                </Tab>
+                </Tab> */}
                 <Tab
                   flex={1}
                   borderColor="black"
@@ -268,7 +268,7 @@ export function Customize() {
               </TabList>
 
               <TabPanels>
-                <TabPanel py={0} px={0}>
+                {/* <TabPanel py={0} px={0}>
                   <Flex
                     flexDirection="column"
                     w="100%"
@@ -471,7 +471,7 @@ export function Customize() {
                       </VStack>
                     </Flex>
 
-                    {/* <Text
+                    <Text
                       textAlign="center"
                       w="100%"
                       fontWeight="700"
@@ -525,9 +525,9 @@ export function Customize() {
                       )}
                     />
 
-                    {errors.appleImage && <span>Apple image is required</span>} */}
+                    {errors.appleImage && <span>Apple image is required</span>}
                   </Flex>
-                </TabPanel>
+                </TabPanel> */}
                 <TabPanel py={0} px={0}>
                   <Flex
                     flexDirection="column"
