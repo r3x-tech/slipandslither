@@ -26,10 +26,7 @@ export async function createTournament(
     throw Error("provider not found");
   }
   // Initialize the tournament authority
-  const authority = new Solana.Http.Tournaments.Client(
-    provider,
-    "mainnet-beta"
-  );
+  const authority = new Solana.Http.Tournaments.Client(provider, "devnet");
 
   console.log("passed authority: ", authority);
 
@@ -81,10 +78,7 @@ export async function enterTournament(
   // Create an Anchor Provider
   const provider = new AnchorProvider(connection, wallet, {});
   // Initialize the participant client
-  const participant = new Solana.Http.Tournaments.Client(
-    provider,
-    "mainnet-beta"
-  );
+  const participant = new Solana.Http.Tournaments.Client(provider, "devnet");
 
   try {
     // Enter the tournament
@@ -104,10 +98,7 @@ export async function startTournament(
   // Create an Anchor Provider
   const provider = new AnchorProvider(connection, wallet, {});
   // Initialize the tournament authority
-  const authority = new Solana.Http.Tournaments.Client(
-    provider,
-    "mainnet-beta"
-  );
+  const authority = new Solana.Http.Tournaments.Client(provider, "devnet");
 
   try {
     // Start the tournament
@@ -126,10 +117,7 @@ export async function getMatch(
 ): Promise<any> {
   // Replace any with the appropriate type
   const provider = new AnchorProvider(connection, wallet, {});
-  const authority = new Solana.Http.Tournaments.Client(
-    provider,
-    "mainnet-beta"
-  );
+  const authority = new Solana.Http.Tournaments.Client(provider, "devnet");
 
   try {
     const matchData = await authority.getMatch(matchPubkey);
@@ -150,10 +138,7 @@ export async function getMatchesByRound(
 ): Promise<any[]> {
   // Replace any[] with the appropriate type
   const provider = new AnchorProvider(connection, wallet, {});
-  const authority = new Solana.Http.Tournaments.Client(
-    provider,
-    "mainnet-beta"
-  );
+  const authority = new Solana.Http.Tournaments.Client(provider, "devnet");
 
   try {
     const matches = await authority.getMatchesByRound(
@@ -176,10 +161,7 @@ export async function getMatchParticipants(
   connection: Connection
 ): Promise<string[]> {
   const provider = new AnchorProvider(connection, wallet, {});
-  const authority = new Solana.Http.Tournaments.Client(
-    provider,
-    "mainnet-beta"
-  );
+  const authority = new Solana.Http.Tournaments.Client(provider, "devnet");
 
   try {
     const participants = await authority.getMatchParticipants(
@@ -201,10 +183,7 @@ export async function getParticipantsForRound(
   connection: Connection
 ): Promise<string[]> {
   const provider = new AnchorProvider(connection, wallet, {});
-  const authority = new Solana.Http.Tournaments.Client(
-    provider,
-    "mainnet-beta"
-  );
+  const authority = new Solana.Http.Tournaments.Client(provider, "devnet");
 
   try {
     const participants = await authority.getParticipantsForRound(
@@ -227,10 +206,7 @@ export async function getTournamentStandings(
   // Create an Anchor Provider
   const provider = new AnchorProvider(connection, wallet, {});
   // Initialize the tournament authority
-  const authority = new Solana.Http.Tournaments.Client(
-    provider,
-    "mainnet-beta"
-  );
+  const authority = new Solana.Http.Tournaments.Client(provider, "devnet");
 
   try {
     const standings = await authority.getStandings(tournamentPubkey);
@@ -251,10 +227,7 @@ export async function getTournamentDetails(
   // Create an Anchor Provider
   const provider = new AnchorProvider(connection, wallet, {});
   // Initialize the tournament authority
-  const authority = new Solana.Http.Tournaments.Client(
-    provider,
-    "mainnet-beta"
-  );
+  const authority = new Solana.Http.Tournaments.Client(provider, "devnet");
 
   try {
     const tournamentData = await authority.getTournament(tournamentPubkey);

@@ -289,7 +289,15 @@ export const LoginComponent = () => {
 
         console.log("here:");
 
-        let userInfo = await particleConnect();
+        const solanaDevnet = {
+          id: 103,
+          name: "Solana",
+        };
+
+        // let userInfo = await particleConnect();
+        let userInfo = await particleConnect({
+          chain: solanaDevnet,
+        });
 
         console.log("there");
 
