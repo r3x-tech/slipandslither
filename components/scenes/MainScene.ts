@@ -199,7 +199,7 @@ export default class MainScene extends Phaser.Scene {
         Number(this.sys.game.config.height) - 20
       );
       newOraPosition = new Phaser.Math.Vector2(oraX, oraY);
-    } while (this.isPositionInvalid(newOraPosition)); // You may need to implement this method to check position validity
+    } while (this.isPositionInvalid(newOraPosition));
 
     this.ora = this.physics.add
       .sprite(newOraPosition.x, newOraPosition.y, "ora")
@@ -214,10 +214,10 @@ export default class MainScene extends Phaser.Scene {
     player: Phaser.Physics.Arcade.Sprite,
     ora: Phaser.Physics.Arcade.Sprite
   ) {
-    this.oraEaten = true; // Set oraEaten flag to true
-    ora.destroy(); // Remove ora from the scene
+    this.oraEaten = true;
+    ora.destroy();
     // Trigger the winning condition
-    this.scene.start("WinningScreen", { score: this.score }); // Assuming you have a WinningScreen scene
+    this.scene.start("WinningScreen", { score: this.score });
   }
 
   togglePause() {
