@@ -8,6 +8,7 @@ const theme = extendTheme({
     quaternary: "#FF2768",
     black: "#000000",
     white: "#FFFFFF",
+    green: "#00BF63",
     red: "#FF0000",
     gray: "#A0A0A0",
     lightGray: "#F5F5F7",
